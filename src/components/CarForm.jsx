@@ -12,6 +12,9 @@ const CarForm = ({ car, onSubmit, onClose }) => {
     available: true
   });
 
+  const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(false);
+
   useEffect(() => {
     if (car) {
       setFormData({
@@ -32,24 +35,60 @@ const CarForm = ({ car, onSubmit, onClose }) => {
       ...prev,
       [name]: type === 'checkbox' ? checked : value
     }));
+    
+    // Clear error when user starts typing
+    if (errors[name]) {
+      setErrors(prev => ({
+        ...prev,
+        [name]: ''
+      }));
+    }
   };
 
-  const handleSubmit = (e) => {
+  const validateForm = () => {
+    const newErrors = {};
+
+    if (!formData.name.trim()) {
+      newErrors.name = 'Car name is required';
+    }
+
+    if (!formData.type) {
+      newErrors.type = 'Car type is required';
+    }
+
+    if (!formData.price) {
+      newErrors.price = 'Price is required';
+    } else if (isNaN(formData.price) || parseFloat(formData.price) <= 0) {
+      newErrors.price = 'Price must be a valid number greater than 0';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     
-    // Validate required fields
-    if (!formData.name || !formData.type || !formData.price) {
-      alert('Please fill in all required fields');
+    if (!validateForm()) {
       return;
     }
 
-    // Convert price to number
-    const carData = {
-      ...formData,
-      price: parseFloat(formData.price)
-    };
+    setLoading(true);
+    try {
+      const carData = {
+        ...formData,
+        price: parseFloat(formData.price),
+        name: formData.name.trim(),
+        description: formData.description.trim(),
+        features: formData.features.trim()
+      };
 
-    onSubmit(carData);
+      await onSubmit(carData);
+    } catch (error) {
+      alert('Error saving car: ' + error.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -57,7 +96,14 @@ const CarForm = ({ car, onSubmit, onClose }) => {
       <div className="car-form-modal">
         <div className="car-form-header">
           <h2>{car ? 'Edit Car' : 'Add New Car'}</h2>
-          <button className="close-btn" onClick={onClose}>×</button>
+          <button 
+            type="button" 
+            className="close-btn" 
+            onClick={onClose}
+            disabled={loading}
+          >
+            ×
+          </button>
         </div>
         
         <form onSubmit={handleSubmit} className="car-form">
@@ -69,8 +115,11 @@ const CarForm = ({ car, onSubmit, onClose }) => {
               name="name"
               value={formData.name}
               onChange={handleChange}
-              required
+              className={errors.name ? 'error' : ''}
+              placeholder="Enter car name"
+              disabled={loading}
             />
+            {errors.name && <span className="error-text">{errors.name}</span>}
           </div>
 
           <div className="form-group">
@@ -80,7 +129,8 @@ const CarForm = ({ car, onSubmit, onClose }) => {
               name="type"
               value={formData.type}
               onChange={handleChange}
-              required
+              className={errors.type ? 'error' : ''}
+              disabled={loading}
             >
               <option value="">Select Type</option>
               <option value="SUV">SUV</option>
@@ -89,7 +139,11 @@ const CarForm = ({ car, onSubmit, onClose }) => {
               <option value="Sports">Sports</option>
               <option value="Luxury">Luxury</option>
               <option value="Electric">Electric</option>
+              <option value="Convertible">Convertible</option>
+              <option value="Minivan">Minivan</option>
+              <option value="Pickup Truck">Pickup Truck</option>
             </select>
+            {errors.type && <span className="error-text">{errors.type}</span>}
           </div>
 
           <div className="form-group">
@@ -100,10 +154,13 @@ const CarForm = ({ car, onSubmit, onClose }) => {
               name="price"
               value={formData.price}
               onChange={handleChange}
+              className={errors.price ? 'error' : ''}
               min="0"
               step="0.01"
-              required
+              placeholder="0.00"
+              disabled={loading}
             />
+            {errors.price && <span className="error-text">{errors.price}</span>}
           </div>
 
           <div className="form-group">
@@ -115,7 +172,9 @@ const CarForm = ({ car, onSubmit, onClose }) => {
               value={formData.image}
               onChange={handleChange}
               placeholder="https://example.com/car-image.jpg"
+              disabled={loading}
             />
+            <small className="help-text">Provide a direct link to the car image</small>
           </div>
 
           <div className="form-group">
@@ -126,6 +185,8 @@ const CarForm = ({ car, onSubmit, onClose }) => {
               value={formData.description}
               onChange={handleChange}
               rows="3"
+              placeholder="Enter car description"
+              disabled={loading}
             />
           </div>
 
@@ -138,6 +199,7 @@ const CarForm = ({ car, onSubmit, onClose }) => {
               value={formData.features}
               onChange={handleChange}
               placeholder="GPS, Bluetooth, Air Conditioning, etc."
+              disabled={loading}
             />
           </div>
 
@@ -148,17 +210,27 @@ const CarForm = ({ car, onSubmit, onClose }) => {
                 name="available"
                 checked={formData.available}
                 onChange={handleChange}
+                disabled={loading}
               />
               Available for rent
             </label>
           </div>
 
           <div className="form-actions">
-            <button type="button" onClick={onClose} className="btn btn-secondary">
+            <button 
+              type="button" 
+              onClick={onClose} 
+              className="btn btn-secondary"
+              disabled={loading}
+            >
               Cancel
             </button>
-            <button type="submit" className="btn btn-primary">
-              {car ? 'Update Car' : 'Add Car'}
+            <button 
+              type="submit" 
+              className="btn btn-primary"
+              disabled={loading}
+            >
+              {loading ? 'Saving...' : (car ? 'Update Car' : 'Add Car')}
             </button>
           </div>
         </form>
