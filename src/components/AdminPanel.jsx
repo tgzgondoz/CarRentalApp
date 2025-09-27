@@ -1,0 +1,89 @@
+import { useState } from 'react';
+import { useAuth } from '../context/AuthContext';
+import { useCars } from '../hooks/useCars';
+import CarForm from './CarForm';
+import './AdminPanel.css';
+
+const AdminPanel = ({ onBack }) => {
+  const { logout, currentUser } = useAuth();
+  const { cars, loading, deleteCar } = useCars();
+  const [showForm, setShowForm] = useState(false);
+  const [editingCar, setEditingCar] = useState(null);
+
+  const handleEdit = (car) => {
+    setEditingCar(car);
+    setShowForm(true);
+  };
+
+  const handleAddNew = () => {
+    setEditingCar(null);
+    setShowForm(true);
+  };
+
+  const handleFormClose = () => {
+    setShowForm(false);
+    setEditingCar(null);
+  };
+
+  const handleDelete = async (carId) => {
+    if (window.confirm('Are you sure you want to delete this car?')) {
+      try {
+        await deleteCar(carId);
+      } catch (error) {
+        alert('Error deleting car: ' + error.message);
+      }
+    }
+  };
+
+  if (loading) {
+    return <div className="loading">Loading...</div>;
+  }
+
+  return (
+    <div className="admin-panel">
+      <div className="admin-header">
+        <div>
+          <button onClick={onBack} className="back-btn">← Back to Site</button>
+          <h1>Admin Panel</h1>
+        </div>
+        <div className="admin-actions">
+          <span>Welcome, {currentUser?.email}</span>
+          <button onClick={handleAddNew} className="btn btn-primary">Add New Car</button>
+          <button onClick={logout} className="btn btn-secondary">Logout</button>
+        </div>
+      </div>
+
+      {showForm && (
+        <CarForm car={editingCar} onClose={handleFormClose} />
+      )}
+
+      <div className="cars-list">
+        <h2>Manage Cars ({cars.length})</h2>
+        <div className="cars-grid">
+          {cars.map(car => (
+            <div key={car.id} className="admin-car-card">
+              <div className="car-image">
+                <img src={car.image || '/placeholder-car.jpg'} alt={car.name} />
+              </div>
+              <div className="car-info">
+                <h3>{car.name}</h3>
+                <p>Type: {car.type}</p>
+                <p>Price: ${car.price}/day</p>
+                <div className="car-actions">
+                  <button onClick={() => handleEdit(car)} className="btn btn-primary">
+                    Edit
+                  </button>
+                  <button onClick={() => handleDelete(car.id)} className="btn btn-danger">
+                    Delete
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default AdminPanel;
