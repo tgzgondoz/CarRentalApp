@@ -4,9 +4,9 @@ import { useCars } from '../hooks/useCars';
 import CarForm from './CarForm';
 import './AdminPanel.css';
 
-const AdminPanel = ({ onBack }) => {
+const AdminPanel = () => {
   const { logout, currentUser } = useAuth();
-  const { cars, loading, deleteCar } = useCars();
+  const { cars, loading, deleteCar, addCar, updateCar } = useCars();
   const [showForm, setShowForm] = useState(false);
   const [editingCar, setEditingCar] = useState(null);
 
@@ -23,6 +23,21 @@ const AdminPanel = ({ onBack }) => {
   const handleFormClose = () => {
     setShowForm(false);
     setEditingCar(null);
+  };
+
+  const handleFormSubmit = async (carData) => {
+    try {
+      if (editingCar) {
+        // Update existing car
+        await updateCar(editingCar.id, carData);
+      } else {
+        // Add new car
+        await addCar(carData);
+      }
+      handleFormClose();
+    } catch (error) {
+      alert('Error saving car: ' + error.message);
+    }
   };
 
   const handleDelete = async (carId) => {
@@ -42,10 +57,7 @@ const AdminPanel = ({ onBack }) => {
   return (
     <div className="admin-panel">
       <div className="admin-header">
-        <div>
-          <button onClick={onBack} className="back-btn">← Back to Site</button>
-          <h1>Admin Panel</h1>
-        </div>
+        <h1>Admin Panel</h1>
         <div className="admin-actions">
           <span>Welcome, {currentUser?.email}</span>
           <button onClick={handleAddNew} className="btn btn-primary">Add New Car</button>
@@ -54,7 +66,11 @@ const AdminPanel = ({ onBack }) => {
       </div>
 
       {showForm && (
-        <CarForm car={editingCar} onClose={handleFormClose} />
+        <CarForm 
+          car={editingCar} 
+          onSubmit={handleFormSubmit}
+          onClose={handleFormClose} 
+        />
       )}
 
       <div className="cars-list">
@@ -69,6 +85,7 @@ const AdminPanel = ({ onBack }) => {
                 <h3>{car.name}</h3>
                 <p>Type: {car.type}</p>
                 <p>Price: ${car.price}/day</p>
+                <p>Status: {car.available ? 'Available' : 'Not Available'}</p>
                 <div className="car-actions">
                   <button onClick={() => handleEdit(car)} className="btn btn-primary">
                     Edit
