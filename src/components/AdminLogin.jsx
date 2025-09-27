@@ -1,13 +1,15 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import './AdminLogin.css';
 
-const AdminLogin = ({ onBack }) => {
+const AdminLogin = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -16,10 +18,16 @@ const AdminLogin = ({ onBack }) => {
       setError('');
       setLoading(true);
       await login(email, password);
+      // Redirect to admin panel after successful login
+      navigate('/admin');
     } catch (error) {
       setError('Failed to log in: ' + error.message);
     }
     setLoading(false);
+  };
+
+  const handleBackToSite = () => {
+    navigate('/');
   };
 
   return (
@@ -27,7 +35,7 @@ const AdminLogin = ({ onBack }) => {
       <div className="login-container">
         <div className="login-header">
           <h2>Admin Login</h2>
-          <button onClick={onBack} className="back-btn">← Back to Site</button>
+          <button onClick={handleBackToSite} className="back-btn">← Back to Site</button>
         </div>
         {error && <div className="error">{error}</div>}
         <form onSubmit={handleSubmit}>

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useCars } from '../hooks/useCars';
 import CarForm from './CarForm';
@@ -9,6 +10,7 @@ const AdminPanel = () => {
   const { cars, loading, deleteCar, addCar, updateCar } = useCars();
   const [showForm, setShowForm] = useState(false);
   const [editingCar, setEditingCar] = useState(null);
+  const navigate = useNavigate();
 
   const handleEdit = (car) => {
     setEditingCar(car);
@@ -28,10 +30,8 @@ const AdminPanel = () => {
   const handleFormSubmit = async (carData) => {
     try {
       if (editingCar) {
-        // Update existing car
         await updateCar(editingCar.id, carData);
       } else {
-        // Add new car
         await addCar(carData);
       }
       handleFormClose();
@@ -50,12 +50,18 @@ const AdminPanel = () => {
     }
   };
 
-  if (loading) {
+  const handleBackToSite = () => {
+    navigate('/');
+  };
+
+  if (loading && cars.length === 0) {
     return <div className="loading">Loading...</div>;
   }
 
   return (
     <div className="admin-panel">
+      
+      
       <div className="admin-header">
         <h1>Admin Panel</h1>
         <div className="admin-actions">
@@ -79,7 +85,13 @@ const AdminPanel = () => {
           {cars.map(car => (
             <div key={car.id} className="admin-car-card">
               <div className="car-image">
-                <img src={car.image || '/placeholder-car.jpg'} alt={car.name} />
+                <img 
+                  src={car.image || '/placeholder-car.jpg'} 
+                  alt={car.name}
+                  onError={(e) => {
+                    e.target.src = '/placeholder-car.jpg';
+                  }}
+                />
               </div>
               <div className="car-info">
                 <h3>{car.name}</h3>
