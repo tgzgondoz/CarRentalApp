@@ -1,95 +1,78 @@
 import { useState, useEffect } from 'react';
-import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc } from 'firebase/firestore';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { db, storage } from '../firebase/config';
+import { db } from '../firebase/config';
+import { ref, onValue } from 'firebase/database';
 
 export const useCars = () => {
   const [cars, setCars] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetchCars();
+    const carsRef = ref(db, 'cars');
+    
+    const unsubscribe = onValue(carsRef, 
+      (snapshot) => {
+        try {
+          const carsData = snapshot.val();
+          if (carsData) {
+            const carsArray = Object.keys(carsData).map(key => ({
+              id: key,
+              ...carsData[key]
+            }));
+            setCars(carsArray);
+          } else {
+            setCars([]);
+          }
+          setLoading(false);
+          setError(null);
+        } catch (err) {
+          setError('Error loading cars');
+          setLoading(false);
+        }
+      },
+      (error) => {
+        setError('Failed to load cars: ' + error.message);
+        setLoading(false);
+      }
+    );
+
+    return () => unsubscribe();
   }, []);
 
-  const fetchCars = async () => {
+  // For admin functions (add, update, delete)
+  const addCar = async (carData) => {
     try {
-      const querySnapshot = await getDocs(collection(db, 'cars'));
-      const carsData = querySnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      }));
-      setCars(carsData);
+      const { push } = await import('firebase/database');
+      const carsRef = ref(db, 'cars');
+      await push(carsRef, {
+        ...carData,
+        createdAt: new Date().toISOString(),
+        available: carData.available !== undefined ? carData.available : true
+      });
     } catch (error) {
-      console.error('Error fetching cars:', error);
-    } finally {
-      setLoading(false);
+      throw new Error('Failed to add car: ' + error.message);
     }
   };
 
-  const addCar = async (carData, imageFile) => {
+  const updateCar = async (carId, carData) => {
     try {
-      let imageUrl = '';
-      
-      if (imageFile) {
-        const imageRef = ref(storage, `cars/${Date.now()}_${imageFile.name}`);
-        await uploadBytes(imageRef, imageFile);
-        imageUrl = await getDownloadURL(imageRef);
-      }
-
-      const carWithImage = {
-        ...carData,
-        image: imageUrl,
-        createdAt: new Date().toISOString()
-      };
-
-      await addDoc(collection(db, 'cars'), carWithImage);
-      await fetchCars();
+      const { update } = await import('firebase/database');
+      const carRef = ref(db, `cars/${carId}`);
+      await update(carRef, carData);
     } catch (error) {
-      console.error('Error adding car:', error);
-      throw error;
-    }
-  };
-
-  const updateCar = async (carId, carData, imageFile) => {
-    try {
-      let imageUrl = carData.image;
-      
-      if (imageFile) {
-        const imageRef = ref(storage, `cars/${Date.now()}_${imageFile.name}`);
-        await uploadBytes(imageRef, imageFile);
-        imageUrl = await getDownloadURL(imageRef);
-      }
-
-      const carWithImage = {
-        ...carData,
-        image: imageUrl,
-        updatedAt: new Date().toISOString()
-      };
-
-      await updateDoc(doc(db, 'cars', carId), carWithImage);
-      await fetchCars();
-    } catch (error) {
-      console.error('Error updating car:', error);
-      throw error;
+      throw new Error('Failed to update car: ' + error.message);
     }
   };
 
   const deleteCar = async (carId) => {
     try {
-      await deleteDoc(doc(db, 'cars', carId));
-      await fetchCars();
+      const { remove } = await import('firebase/database');
+      const carRef = ref(db, `cars/${carId}`);
+      await remove(carRef);
     } catch (error) {
-      console.error('Error deleting car:', error);
-      throw error;
+      throw new Error('Failed to delete car: ' + error.message);
     }
   };
 
-  return {
-    cars,
-    loading,
-    addCar,
-    updateCar,
-    deleteCar,
-    refetch: fetchCars
-  };
+  return { cars, loading, error, addCar, updateCar, deleteCar };
 };
