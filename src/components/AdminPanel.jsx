@@ -14,7 +14,8 @@ const AdminPanel = () => {
   const [editingCar, setEditingCar] = useState(null);
   const [rentals, setRentals] = useState([]);
   const [rentalsLoading, setRentalsLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState('all'); // 'all', 'available', 'rented'
+  const [activeTab, setActiveTab] = useState('all');
+  const [expandedCards, setExpandedCards] = useState({});
   const navigate = useNavigate();
 
   // Fetch rentals data from Firebase Realtime Database
@@ -53,11 +54,17 @@ const AdminPanel = () => {
 
     fetchRentals();
 
-    // Cleanup function to remove listener
     return () => {
       off(rentalsRef);
     };
   }, []);
+
+  const toggleCardExpansion = (carId) => {
+    setExpandedCards(prev => ({
+      ...prev,
+      [carId]: !prev[carId]
+    }));
+  };
 
   const handleEdit = (car) => {
     setEditingCar(car);
@@ -101,11 +108,9 @@ const AdminPanel = () => {
     navigate('/');
   };
 
-  // Mark rental as completed and make car available again
   const handleCompleteRental = async (rentalId, carId) => {
     if (window.confirm('Are you sure you want to mark this rental as completed?')) {
       try {
-        // Update rental status
         const rentalRef = ref(db, `rentals/${rentalId}`);
         await update(rentalRef, {
           status: 'completed',
@@ -113,7 +118,6 @@ const AdminPanel = () => {
           updatedAt: new Date().toISOString()
         });
 
-        // Make car available again
         const carRef = ref(db, `cars/${carId}`);
         await update(carRef, {
           available: true,
@@ -128,7 +132,6 @@ const AdminPanel = () => {
     }
   };
 
-  // Calculate time remaining for rented cars
   const calculateTimeRemaining = (rentalEndTime) => {
     const now = new Date();
     const endTime = new Date(rentalEndTime);
@@ -262,96 +265,156 @@ const AdminPanel = () => {
         {rentalsLoading ? (
           <div className="loading">Loading rental data...</div>
         ) : (
-          <div className="cars-grid">
-            {filteredCars.map(car => (
-              <div key={car.id} className={`admin-car-card ${car.rentalInfo ? 'rented' : ''}`}>
-                <div className="car-image">
-                  <img 
-                    src={car.image || '/placeholder-car.jpg'} 
-                    alt={car.name}
-                    onError={(e) => {
-                      e.target.src = '/placeholder-car.jpg';
-                    }}
-                  />
-                  {car.rentalInfo && (
-                    <div className="rented-badge">RENTED</div>
-                  )}
-                </div>
-                
-                <div className="car-info">
-                  <h3>{car.name}</h3>
-                  <p>Type: {car.type}</p>
-                  <p>Price: ${car.price}/day</p>
-                  <p className={`status ${car.rentalInfo ? 'rented' : car.available ? 'available' : 'unavailable'}`}>
-                    Status: {car.rentalInfo ? 'Rented' : car.available ? 'Available' : 'Not Available'}
-                  </p>
-                  
-                  {/* Rental Information */}
-                  {car.rentalInfo && (
-                    <div className="rental-details">
-                      <h4>Rental Information:</h4>
-                      <div className="rental-info-item">
-                        <strong>Customer:</strong> {car.rentalInfo.customerName}
+          <div className="cars-grid compact">
+            {filteredCars.map(car => {
+              const isExpanded = expandedCards[car.id];
+              const hasRental = !!car.rentalInfo;
+              
+              return (
+                <div 
+                  key={car.id} 
+                  className={`admin-car-card compact ${hasRental ? 'rented' : ''} ${isExpanded ? 'expanded' : ''}`}
+                  onClick={() => !isExpanded && toggleCardExpansion(car.id)}
+                >
+                  <div className="card-header">
+                    <div className="car-image">
+                      <img 
+                        src={car.image || '/placeholder-car.jpg'} 
+                        alt={car.name}
+                        onError={(e) => {
+                          e.target.src = '/placeholder-car.jpg';
+                        }}
+                      />
+                      {hasRental && (
+                        <div className="rented-badge">RENTED</div>
+                      )}
+                    </div>
+                    
+                    <div className="car-basic-info">
+                      <h3>{car.name}</h3>
+                      <p className="car-type">{car.type}</p>
+                      <p className="car-price">${car.price}/day</p>
+                      <div className={`status-indicator ${hasRental ? 'rented' : car.available ? 'available' : 'unavailable'}`}>
+                        {hasRental ? 'Rented' : car.available ? 'Available' : 'Unavailable'}
                       </div>
-                      <div className="rental-info-item">
-                        <strong>Email:</strong> {car.rentalInfo.email}
-                      </div>
-                      <div className="rental-info-item">
-                        <strong>Contact:</strong> {car.rentalInfo.phone}
-                      </div>
-                      <div className="rental-info-item">
-                        <strong>ID Number:</strong> {car.rentalInfo.idNumber || 'N/A'}
-                      </div>
-                      <div className="rental-info-item">
-                        <strong>License:</strong> {car.rentalInfo.licenseNumber || 'N/A'}
-                      </div>
-                      <div className="rental-info-item">
-                        <strong>Rental Period:</strong> {car.rentalInfo.rentalDays} days
-                      </div>
-                      <div className="rental-info-item">
-                        <strong>Start:</strong> {formatRentalDate(car.rentalInfo.rentalStartTime)}
-                      </div>
-                      <div className="rental-info-item">
-                        <strong>End:</strong> {formatRentalDate(car.rentalInfo.rentalEndTime)}
-                      </div>
-                      <div className="rental-info-item">
-                        <strong>Time Remaining:</strong> 
-                        <span className="time-remaining">
-                          {calculateTimeRemaining(car.rentalInfo.rentalEndTime)}
-                        </span>
-                      </div>
-                      <div className="rental-info-item total">
-                        <strong>Total:</strong> ${car.rentalInfo.totalPrice}
-                      </div>
+                    </div>
+                    
+                    <button 
+                      className={`expand-btn ${isExpanded ? 'expanded' : ''}`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleCardExpansion(car.id);
+                      }}
+                    >
+                      {isExpanded ? '▲' : '▼'}
+                    </button>
+                  </div>
+
+                  {/* Expanded Details */}
+                  {isExpanded && (
+                    <div className="card-details">
+                      {hasRental ? (
+                        <div className="rental-details">
+                          <div className="details-section">
+                            <h4>Rental Information</h4>
+                            <div className="details-grid">
+                              <div className="detail-item">
+                                <span className="detail-label">Customer:</span>
+                                <span className="detail-value">{car.rentalInfo.customerName}</span>
+                              </div>
+                              <div className="detail-item">
+                                <span className="detail-label">Email:</span>
+                                <span className="detail-value">{car.rentalInfo.email}</span>
+                              </div>
+                              <div className="detail-item">
+                                <span className="detail-label">Contact:</span>
+                                <span className="detail-value">{car.rentalInfo.phone}</span>
+                              </div>
+                              <div className="detail-item">
+                                <span className="detail-label">ID Number:</span>
+                                <span className="detail-value">{car.rentalInfo.idNumber || 'N/A'}</span>
+                              </div>
+                              <div className="detail-item">
+                                <span className="detail-label">License:</span>
+                                <span className="detail-value">{car.rentalInfo.licenseNumber || 'N/A'}</span>
+                              </div>
+                              <div className="detail-item">
+                                <span className="detail-label">Rental Period:</span>
+                                <span className="detail-value">{car.rentalInfo.rentalDays} days</span>
+                              </div>
+                              <div className="detail-item">
+                                <span className="detail-label">Start:</span>
+                                <span className="detail-value">{formatRentalDate(car.rentalInfo.rentalStartTime)}</span>
+                              </div>
+                              <div className="detail-item">
+                                <span className="detail-label">End:</span>
+                                <span className="detail-value">{formatRentalDate(car.rentalInfo.rentalEndTime)}</span>
+                              </div>
+                              <div className="detail-item">
+                                <span className="detail-label">Time Remaining:</span>
+                                <span className="detail-value time-remaining">
+                                  {calculateTimeRemaining(car.rentalInfo.rentalEndTime)}
+                                </span>
+                              </div>
+                              <div className="detail-item total">
+                                <span className="detail-label">Total:</span>
+                                <span className="detail-value">${car.rentalInfo.totalPrice}</span>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="action-buttons">
+                            <button 
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleCompleteRental(car.rentalInfo.id, car.id);
+                              }}
+                              className="btn btn-success btn-sm"
+                            >
+                              Mark as Completed
+                            </button>
+                            <button 
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                navigate(`/rental-details/${car.rentalInfo.id}`);
+                              }}
+                              className="btn btn-info btn-sm"
+                            >
+                              View Details
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="no-rental-info">
+                          <p>This car is currently available for rental.</p>
+                        </div>
+                      )}
                       
-                      <div className="rental-actions">
+                      <div className="car-management-actions">
                         <button 
-                          onClick={() => handleCompleteRental(car.rentalInfo.id, car.id)}
-                          className="btn btn-success"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleEdit(car);
+                          }}
+                          className="btn btn-primary btn-sm"
                         >
-                          Mark as Completed
+                          Edit Car
                         </button>
                         <button 
-                          onClick={() => navigate(`/rental-details/${car.rentalInfo.id}`)}
-                          className="btn btn-info"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDelete(car.id);
+                          }}
+                          className="btn btn-danger btn-sm"
                         >
-                          View Details
+                          Delete Car
                         </button>
                       </div>
                     </div>
                   )}
-                  
-                  <div className="car-actions">
-                    <button onClick={() => handleEdit(car)} className="btn btn-primary">
-                      Edit
-                    </button>
-                    <button onClick={() => handleDelete(car.id)} className="btn btn-danger">
-                      Delete
-                    </button>
-                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
         
