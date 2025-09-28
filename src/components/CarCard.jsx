@@ -136,10 +136,10 @@ const CarCard = ({ car, currentRental, onRentalUpdate }) => {
           onError={handleImageError}
         />
         {isPremium && (
-          <div className="premium-badge">PREMIUM</div>
+          <div className="premium-badge">P</div>
         )}
         <div className={`car-status ${isRented ? 'rented' : normalizedCar.available ? 'available' : 'unavailable'}`}>
-          {isRented ? 'RENTED' : normalizedCar.available ? 'AVAILABLE' : 'NOT AVAILABLE'}
+          {isRented ? 'RENTED' : normalizedCar.available ? 'A' : 'X'}
         </div>
         {isRented && <div className="rented-overlay">CURRENTLY RENTED</div>}
       </div>
