@@ -2,46 +2,96 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './CarCard.css';
 
-const CarCard = ({ car, currentRental }) => {
+const CarCard = ({ car, currentRental, onRentalUpdate }) => {
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
   const [timeRemaining, setTimeRemaining] = useState('');
+  const [localRental, setLocalRental] = useState(currentRental);
   const navigate = useNavigate();
 
-  // Check if this car is currently rented
-  const isRented = currentRental && currentRental.carId === car.id && currentRental.status === 'active';
+  // Normalize car data to handle different structures
+  const normalizedCar = {
+    id: car.id || car.name?.replace(/\s+/g, '-').toLowerCase(),
+    name: car.name || 'Unknown Car',
+    type: car.type || car.category || 'Standard',
+    price: car.price || parseInt(car.priceText?.replace(/[^0-9]/g, '') || '0'),
+    description: car.description || 'No description available',
+    image: car.image || '/placeholder-car.jpg',
+    available: car.available !== undefined ? car.available : true,
+    features: Array.isArray(car.features) ? car.features : 
+              car.features ? car.features.split(',').map(f => f.trim()) : []
+  };
 
+  // Check if this car is currently rented
+  const isRented = (localRental && localRental.carId === normalizedCar.id && localRental.status === 'active') || 
+                  (currentRental && currentRental.carId === normalizedCar.id && currentRental.status === 'active');
+
+  // Sync local rental state with prop changes
+  useEffect(() => {
+    if (currentRental) {
+      setLocalRental(currentRental);
+    }
+  }, [currentRental]);
+
+  // Handle rental confirmation
+  const handleRentalConfirmation = (rentalData) => {
+    if (rentalData.carId === normalizedCar.id) {
+      setLocalRental({
+        ...rentalData,
+        status: 'active'
+      });
+      
+      if (onRentalUpdate) {
+        onRentalUpdate(rentalData);
+      }
+    }
+  };
+
+  // Time remaining calculation
   useEffect(() => {
     let interval;
     
-    if (isRented && currentRental.rentalEndTime) {
-      // Update time remaining every minute
+    const activeRental = localRental || currentRental;
+    
+    if (isRented && activeRental && activeRental.rentalEndTime) {
       interval = setInterval(() => {
         const now = new Date();
-        const endTime = new Date(currentRental.rentalEndTime);
+        const endTime = new Date(activeRental.rentalEndTime);
         const diff = endTime - now;
         
         if (diff <= 0) {
           setTimeRemaining('Rental expired');
           clearInterval(interval);
         } else {
-          const hours = Math.floor(diff / (1000 * 60 * 60));
+          const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+          const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
           const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-          setTimeRemaining(`${hours}h ${minutes}m remaining`);
+          
+          if (days > 0) {
+            setTimeRemaining(`${days}d ${hours}h ${minutes}m remaining`);
+          } else {
+            setTimeRemaining(`${hours}h ${minutes}m remaining`);
+          }
         }
       }, 60000);
       
       // Initial calculation
       const now = new Date();
-      const endTime = new Date(currentRental.rentalEndTime);
+      const endTime = new Date(activeRental.rentalEndTime);
       const diff = endTime - now;
-      const hours = Math.floor(diff / (1000 * 60 * 60));
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
       const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-      setTimeRemaining(`${hours}h ${minutes}m remaining`);
+      
+      if (days > 0) {
+        setTimeRemaining(`${days}d ${hours}h ${minutes}m remaining`);
+      } else {
+        setTimeRemaining(`${hours}h ${minutes}m remaining`);
+      }
     }
 
     return () => clearInterval(interval);
-  }, [isRented, currentRental]);
+  }, [isRented, localRental, currentRental]);
 
   const handleImageLoad = () => {
     setImageLoaded(true);
@@ -52,15 +102,15 @@ const CarCard = ({ car, currentRental }) => {
     e.target.src = '/placeholder-car.jpg';
   };
 
-  const isPremium = car.price > 150 || car.type?.toLowerCase().includes('premium') || car.type?.toLowerCase().includes('luxury');
+  const isPremium = normalizedCar.price > 150 || 
+                   normalizedCar.type?.toLowerCase().includes('premium') || 
+                   normalizedCar.type?.toLowerCase().includes('luxury');
 
-  const features = Array.isArray(car.features) 
-    ? car.features 
-    : car.features?.split(',').map(f => f.trim()).filter(f => f) || [];
+  const features = normalizedCar.features || [];
 
   const handleRentClick = () => {
-    if (car.available && !isRented) {
-      navigate(`/rent-car/${car.id}`);
+    if (normalizedCar.available && !isRented) {
+      navigate(`/rent-car/${normalizedCar.id}`);
     }
   };
 
@@ -74,40 +124,55 @@ const CarCard = ({ car, currentRental }) => {
     });
   };
 
+  const activeRental = localRental || currentRental;
+
   return (
     <div className={`car-card ${isRented ? 'rented' : ''}`}>
       <div className={`car-image ${!imageLoaded && !imageError ? 'loading' : ''}`}>
         <img 
-          src={imageError ? '/placeholder-car.jpg' : (car.image || '/placeholder-car.jpg')} 
-          alt={car.name}
+          src={imageError ? '/placeholder-car.jpg' : normalizedCar.image} 
+          alt={normalizedCar.name}
           onLoad={handleImageLoad}
           onError={handleImageError}
         />
         {isPremium && (
-          <div className="premium-badge">Premium</div>
+          <div className="premium-badge">PREMIUM</div>
         )}
-        <div className={`car-status ${isRented ? 'rented' : car.available ? 'available' : 'unavailable'}`}>
-          {isRented ? 'Rented' : car.available ? 'Available' : 'Not Available'}
+        <div className={`car-status ${isRented ? 'rented' : normalizedCar.available ? 'available' : 'unavailable'}`}>
+          {isRented ? 'RENTED' : normalizedCar.available ? 'AVAILABLE' : 'NOT AVAILABLE'}
         </div>
-        {isRented && <div className="rented-overlay">Currently Rented</div>}
+        {isRented && <div className="rented-overlay">CURRENTLY RENTED</div>}
       </div>
       
       <div className="car-info">
-        <h3>{car.name}</h3>
-        <p className="car-type">{car.type}</p>
-        <p className="car-price">${car.price}/day</p>
-        <p className="car-description">{car.description}</p>
+        <h3>{normalizedCar.name}</h3>
+        <p className="car-type">{normalizedCar.type}</p>
+        <p className="car-price">From ${normalizedCar.price}/day</p>
+        <p className="car-description">{normalizedCar.description}</p>
         
         {/* Rental Information Display */}
-        {isRented && currentRental && (
+        {isRented && activeRental && (
           <div className="rental-info">
             <div className="rental-message">
-              <strong>Rented by: {currentRental.customerName}</strong>
+              <strong>Rented by: {activeRental.customerName}</strong>
             </div>
-            <div className="rental-time">
-              <span>Start: {formatRentalDate(currentRental.rentalStartTime)}</span>
-              <span>End: {formatRentalDate(currentRental.rentalEndTime)}</span>
-              <span className="time-remaining">{timeRemaining}</span>
+            <div className="rental-dates">
+              <div className="rental-date-item">
+                <span className="date-label">Start:</span>
+                <span className="date-value">{formatRentalDate(activeRental.rentalStartTime)}</span>
+              </div>
+              <div className="rental-date-item">
+                <span className="date-label">End:</span>
+                <span className="date-value">{formatRentalDate(activeRental.rentalEndTime)}</span>
+              </div>
+              <div className="rental-date-item">
+                <span className="date-label">Duration:</span>
+                <span className="date-value">{activeRental.rentalDays} days</span>
+              </div>
+            </div>
+            <div className="time-remaining-section">
+              <span className="time-remaining-label">Time until return:</span>
+              <span className="time-remaining-value">{timeRemaining}</span>
             </div>
           </div>
         )}
@@ -125,22 +190,33 @@ const CarCard = ({ car, currentRental }) => {
         
         <div className="car-action">
           <button 
-            className={`rent-btn ${isRented ? 'disabled' : ''}`}
+            className={`rent-btn ${isRented ? 'disabled' : normalizedCar.available ? 'available' : 'unavailable'}`}
             onClick={handleRentClick}
-            disabled={!car.available || isRented}
+            disabled={!normalizedCar.available || isRented}
           >
-            {isRented ? 'Currently Rented' : (car.available ? 'Rent Now' : 'Not Available')}
+            {isRented ? 'CURRENTLY RENTED' : (normalizedCar.available ? 'RENT NOW' : 'NOT AVAILABLE')}
           </button>
           
           {isRented && (
             <button 
               className="return-btn"
-              onClick={() => navigate(`/return-car/${car.id}`)}
+              onClick={() => navigate(`/return-car/${normalizedCar.id}`)}
             >
-              Return Car
+              RETURN CAR
             </button>
           )}
         </div>
+        
+        {/* Rental Confirmation Message */}
+        {isRented && activeRental && (
+          <div className="rental-confirmation-message">
+            <div className="confirmation-icon">✓</div>
+            <div className="confirmation-text">
+              <strong>RENTAL CONFIRMED!</strong>
+              <span>Your rental is active until {formatRentalDate(activeRental.rentalEndTime)}</span>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
