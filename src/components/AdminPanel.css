@@ -339,3 +339,152 @@
   font-style: italic;
   grid-column: 1 / -1;
 }
+
+/* Add these styles to your existing AdminPanel.css */
+
+.rental-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  margin: 20px 0;
+}
+
+.stat-card {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  text-align: center;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.stat-number {
+  font-size: 2em;
+  font-weight: bold;
+  display: block;
+  margin-top: 10px;
+}
+
+.stat-number.rented {
+  color: #ff6b6b;
+}
+
+.stat-number.available {
+  color: #51cf66;
+}
+
+.admin-tabs {
+  display: flex;
+  margin: 20px 0;
+  border-bottom: 1px solid #ddd;
+}
+
+.tab-btn {
+  padding: 10px 20px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  transition: all 0.3s;
+}
+
+.tab-btn.active {
+  border-bottom-color: #007bff;
+  color: #007bff;
+  font-weight: bold;
+}
+
+.tab-btn:hover {
+  background-color: #f8f9fa;
+}
+
+.admin-car-card.rented {
+  border-left: 4px solid #ff6b6b;
+  background-color: #fff5f5;
+}
+
+.rented-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: #ff6b6b;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.8em;
+  font-weight: bold;
+}
+
+.rental-details {
+  margin: 15px 0;
+  padding: 15px;
+  background: #f8f9fa;
+  border-radius: 6px;
+  border-left: 4px solid #007bff;
+}
+
+.rental-details h4 {
+  margin: 0 0 10px 0;
+  color: #333;
+}
+
+.rental-info-item {
+  display: flex;
+  justify-content: space-between;
+  margin: 5px 0;
+  font-size: 0.9em;
+}
+
+.rental-info-item.total {
+  border-top: 1px solid #ddd;
+  padding-top: 8px;
+  margin-top: 8px;
+  font-weight: bold;
+  color: #333;
+}
+
+.time-remaining {
+  color: #ff6b6b;
+  font-weight: bold;
+}
+
+.status.rented {
+  color: #ff6b6b;
+  font-weight: bold;
+}
+
+.status.available {
+  color: #51cf66;
+  font-weight: bold;
+}
+
+.status.unavailable {
+  color: #868e96;
+  font-weight: bold;
+}
+
+.no-cars {
+  text-align: center;
+  padding: 40px;
+  color: #868e96;
+  font-size: 1.1em;
+}
+
+.btn-info {
+  background-color: #17a2b8;
+  color: white;
+}
+
+.btn-info:hover {
+  background-color: #138496;
+}
+
+.car-image {
+  position: relative;
+}
+
+.loading {
+  text-align: center;
+  padding: 40px;
+  font-size: 1.2em;
+  color: #666;
+}
