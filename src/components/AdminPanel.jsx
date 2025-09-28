@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useCars } from '../hooks/useCars';
+import { db } from '../firebase/config';
+import { ref, onValue, off, update } from 'firebase/database';
 import CarForm from './CarForm';
 import './AdminPanel.css';
 
@@ -15,55 +17,46 @@ const AdminPanel = () => {
   const [activeTab, setActiveTab] = useState('all'); // 'all', 'available', 'rented'
   const navigate = useNavigate();
 
-  // Fetch rentals data (mock implementation - replace with your actual rentals data source)
+  // Fetch rentals data from Firebase Realtime Database
   useEffect(() => {
-    const fetchRentals = async () => {
+    const rentalsRef = ref(db, 'rentals');
+    
+    const fetchRentals = () => {
       try {
         setRentalsLoading(true);
-        // Mock rentals data - replace with your actual API call
-        const mockRentals = [
-          {
-            id: '1',
-            carId: 'tata-punch',
-            carName: 'Tata Punch',
-            customerName: 'John Doe',
-            email: 'john@example.com',
-            phone: '+1234567890',
-            rentalDays: 3,
-            startDate: '2024-01-15',
-            rentalStartTime: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(), // 2 days ago
-            rentalEndTime: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000).toISOString(), // 1 day from now
-            totalPrice: 39,
-            status: 'active',
-            idFileUrl: '',
-            licenseFileUrl: ''
-          },
-          {
-            id: '2',
-            carId: 'volvo-ex30',
-            carName: 'Volvo EX30',
-            customerName: 'Jane Smith',
-            email: 'jane@example.com',
-            phone: '+0987654321',
-            rentalDays: 7,
-            startDate: '2024-01-10',
-            rentalStartTime: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(), // 7 days ago
-            rentalEndTime: new Date(Date.now()).toISOString(), // Ending today
-            totalPrice: 238,
-            status: 'active',
-            idFileUrl: '',
-            licenseFileUrl: ''
+        
+        onValue(rentalsRef, (snapshot) => {
+          const rentalsData = snapshot.val();
+          const rentalsList = [];
+          
+          if (rentalsData) {
+            Object.keys(rentalsData).forEach(key => {
+              rentalsList.push({
+                id: key,
+                ...rentalsData[key]
+              });
+            });
           }
-        ];
-        setRentals(mockRentals);
+          
+          setRentals(rentalsList);
+          setRentalsLoading(false);
+        }, (error) => {
+          console.error('Error fetching rentals:', error);
+          setRentalsLoading(false);
+        });
+
       } catch (error) {
-        console.error('Error fetching rentals:', error);
-      } finally {
+        console.error('Error setting up rentals listener:', error);
         setRentalsLoading(false);
       }
     };
 
     fetchRentals();
+
+    // Cleanup function to remove listener
+    return () => {
+      off(rentalsRef);
+    };
   }, []);
 
   const handleEdit = (car) => {
@@ -108,6 +101,33 @@ const AdminPanel = () => {
     navigate('/');
   };
 
+  // Mark rental as completed and make car available again
+  const handleCompleteRental = async (rentalId, carId) => {
+    if (window.confirm('Are you sure you want to mark this rental as completed?')) {
+      try {
+        // Update rental status
+        const rentalRef = ref(db, `rentals/${rentalId}`);
+        await update(rentalRef, {
+          status: 'completed',
+          completedAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        });
+
+        // Make car available again
+        const carRef = ref(db, `cars/${carId}`);
+        await update(carRef, {
+          available: true,
+          rentalId: null
+        });
+
+        alert('Rental marked as completed successfully!');
+      } catch (error) {
+        console.error('Error completing rental:', error);
+        alert('Error completing rental: ' + error.message);
+      }
+    }
+  };
+
   // Calculate time remaining for rented cars
   const calculateTimeRemaining = (rentalEndTime) => {
     const now = new Date();
@@ -139,10 +159,13 @@ const AdminPanel = () => {
     });
   };
 
+  // Get active rentals only
+  const activeRentals = rentals.filter(rental => rental.status === 'active');
+
   // Get rented cars with their rental information
   const getRentedCars = () => {
     return cars.map(car => {
-      const rental = rentals.find(r => r.carId === car.id && r.status === 'active');
+      const rental = activeRentals.find(r => r.carId === car.id);
       return {
         ...car,
         rentalInfo: rental
@@ -192,12 +215,18 @@ const AdminPanel = () => {
           <span className="stat-number">{cars.length}</span>
         </div>
         <div className="stat-card">
-          <h3>Rented Cars</h3>
-          <span className="stat-number rented">{rentals.filter(r => r.status === 'active').length}</span>
+          <h3>Active Rentals</h3>
+          <span className="stat-number rented">{activeRentals.length}</span>
+        </div>
+        <div className="stat-card">
+          <h3>Completed Rentals</h3>
+          <span className="stat-number completed">{rentals.filter(r => r.status === 'completed').length}</span>
         </div>
         <div className="stat-card">
           <h3>Available Cars</h3>
-          <span className="stat-number available">{cars.filter(car => car.available && !rentals.find(r => r.carId === car.id && r.status === 'active')).length}</span>
+          <span className="stat-number available">
+            {cars.filter(car => car.available && !activeRentals.find(r => r.carId === car.id)).length}
+          </span>
         </div>
       </div>
 
@@ -213,13 +242,13 @@ const AdminPanel = () => {
           className={`tab-btn ${activeTab === 'rented' ? 'active' : ''}`}
           onClick={() => setActiveTab('rented')}
         >
-          Rented Cars ({rentals.filter(r => r.status === 'active').length})
+          Rented Cars ({activeRentals.length})
         </button>
         <button 
           className={`tab-btn ${activeTab === 'available' ? 'active' : ''}`}
           onClick={() => setActiveTab('available')}
         >
-          Available Cars ({cars.filter(car => car.available && !rentals.find(r => r.carId === car.id && r.status === 'active')).length})
+          Available Cars ({cars.filter(car => car.available && !activeRentals.find(r => r.carId === car.id)).length})
         </button>
       </div>
 
@@ -265,7 +294,16 @@ const AdminPanel = () => {
                         <strong>Customer:</strong> {car.rentalInfo.customerName}
                       </div>
                       <div className="rental-info-item">
+                        <strong>Email:</strong> {car.rentalInfo.email}
+                      </div>
+                      <div className="rental-info-item">
                         <strong>Contact:</strong> {car.rentalInfo.phone}
+                      </div>
+                      <div className="rental-info-item">
+                        <strong>ID Number:</strong> {car.rentalInfo.idNumber || 'N/A'}
+                      </div>
+                      <div className="rental-info-item">
+                        <strong>License:</strong> {car.rentalInfo.licenseNumber || 'N/A'}
                       </div>
                       <div className="rental-info-item">
                         <strong>Rental Period:</strong> {car.rentalInfo.rentalDays} days
@@ -285,6 +323,21 @@ const AdminPanel = () => {
                       <div className="rental-info-item total">
                         <strong>Total:</strong> ${car.rentalInfo.totalPrice}
                       </div>
+                      
+                      <div className="rental-actions">
+                        <button 
+                          onClick={() => handleCompleteRental(car.rentalInfo.id, car.id)}
+                          className="btn btn-success"
+                        >
+                          Mark as Completed
+                        </button>
+                        <button 
+                          onClick={() => navigate(`/rental-details/${car.rentalInfo.id}`)}
+                          className="btn btn-info"
+                        >
+                          View Details
+                        </button>
+                      </div>
                     </div>
                   )}
                   
@@ -295,14 +348,6 @@ const AdminPanel = () => {
                     <button onClick={() => handleDelete(car.id)} className="btn btn-danger">
                       Delete
                     </button>
-                    {car.rentalInfo && (
-                      <button 
-                        onClick={() => navigate(`/rental-details/${car.rentalInfo.id}`)}
-                        className="btn btn-info"
-                      >
-                        View Rental
-                      </button>
-                    )}
                   </div>
                 </div>
               </div>
@@ -315,6 +360,80 @@ const AdminPanel = () => {
             <p>No cars found for the selected filter.</p>
           </div>
         )}
+      </div>
+
+      {/* All Rentals Table */}
+      <div className="rentals-section">
+        <h2>All Rentals</h2>
+        <div className="rentals-table-container">
+          <table className="rentals-table">
+            <thead>
+              <tr>
+                <th>Car</th>
+                <th>Customer</th>
+                <th>Contact</th>
+                <th>Period</th>
+                <th>Start Date</th>
+                <th>End Date</th>
+                <th>Total</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {rentals.map(rental => (
+                <tr key={rental.id} className={`status-${rental.status}`}>
+                  <td>
+                    <div className="car-info-small">
+                      <strong>{rental.carName}</strong>
+                      <small>{rental.carType}</small>
+                    </div>
+                  </td>
+                  <td>
+                    <div>
+                      <strong>{rental.customerName}</strong>
+                      <small>{rental.email}</small>
+                    </div>
+                  </td>
+                  <td>{rental.phone}</td>
+                  <td>{rental.rentalDays} days</td>
+                  <td>{formatRentalDate(rental.rentalStartTime)}</td>
+                  <td>{formatRentalDate(rental.rentalEndTime)}</td>
+                  <td>${rental.totalPrice}</td>
+                  <td>
+                    <span className={`status-badge ${rental.status}`}>
+                      {rental.status}
+                    </span>
+                  </td>
+                  <td>
+                    <div className="table-actions">
+                      <button 
+                        onClick={() => navigate(`/rental-details/${rental.id}`)}
+                        className="btn btn-sm btn-info"
+                      >
+                        View
+                      </button>
+                      {rental.status === 'active' && (
+                        <button 
+                          onClick={() => handleCompleteRental(rental.id, rental.carId)}
+                          className="btn btn-sm btn-success"
+                        >
+                          Complete
+                        </button>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          
+          {rentals.length === 0 && !rentalsLoading && (
+            <div className="no-rentals">
+              <p>No rental records found.</p>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
