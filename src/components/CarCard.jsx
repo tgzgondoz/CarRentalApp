@@ -7,8 +7,7 @@ const CarCard = ({ car, currentRental, onRentalUpdate }) => {
   const [imageError, setImageError] = useState(false);
   const [timeRemaining, setTimeRemaining] = useState('');
   const [localRental, setLocalRental] = useState(currentRental);
-  const [isImageZoomed, setIsImageZoomed] = useState(false);
-  const [zoomPosition, setZoomPosition] = useState({ x: 0, y: 0 });
+  const [showImageModal, setShowImageModal] = useState(false);
   const navigate = useNavigate();
 
   // Normalize car data to handle different structures
@@ -49,22 +48,21 @@ const CarCard = ({ car, currentRental, onRentalUpdate }) => {
     }
   };
 
-  // Image zoom handlers
+  // Image modal handlers
   const handleImageClick = (e) => {
     e.stopPropagation();
-    setIsImageZoomed(true);
+    setShowImageModal(true);
   };
 
-  const handleZoomedImageClick = (e) => {
+  const handleCloseModal = (e) => {
     e.stopPropagation();
-    setIsImageZoomed(false);
+    setShowImageModal(false);
   };
 
-  const handleZoomedImageMove = (e) => {
-    const { left, top, width, height } = e.target.getBoundingClientRect();
-    const x = ((e.clientX - left) / width) * 100;
-    const y = ((e.clientY - top) / height) * 100;
-    setZoomPosition({ x, y });
+  const handleModalClick = (e) => {
+    if (e.target === e.currentTarget) {
+      setShowImageModal(false);
+    }
   };
 
   // Time remaining calculation
@@ -150,15 +148,18 @@ const CarCard = ({ car, currentRental, onRentalUpdate }) => {
     <>
       <div className={`car-card ${isRented ? 'rented' : ''}`}>
         <div 
-          className={`car-image ${!imageLoaded && !imageError ? 'loading' : ''}`}
+          className={`car-image-container ${!imageLoaded && !imageError ? 'loading' : ''}`}
           onClick={handleImageClick}
         >
-          <img 
-            src={imageError ? '/placeholder-car.jpg' : normalizedCar.image} 
-            alt={normalizedCar.name}
-            onLoad={handleImageLoad}
-            onError={handleImageError}
-          />
+          <div className="car-image-wrapper">
+            <img 
+              src={imageError ? '/placeholder-car.jpg' : normalizedCar.image} 
+              alt={normalizedCar.name}
+              onLoad={handleImageLoad}
+              onError={handleImageError}
+              className="car-image"
+            />
+          </div>
           {isPremium && (
             <div className="premium-badge">P</div>
           )}
@@ -166,6 +167,7 @@ const CarCard = ({ car, currentRental, onRentalUpdate }) => {
             {isRented ? 'RENTED' : normalizedCar.available ? 'A' : 'X'}
           </div>
           {isRented && <div className="rented-overlay">CURRENTLY RENTED</div>}
+          <div className="image-view-hint">Click to view</div>
         </div>
         
         <div className="car-info">
@@ -244,31 +246,32 @@ const CarCard = ({ car, currentRental, onRentalUpdate }) => {
         </div>
       </div>
 
-      {/* Image Zoom Overlay */}
-      {isImageZoomed && (
+      {/* Image Modal */}
+      {showImageModal && (
         <div 
-          className="image-zoom-overlay" 
-          onClick={handleZoomedImageClick}
+          className="image-modal-overlay" 
+          onClick={handleModalClick}
         >
-          <div className="zoomed-image-container">
-            <img 
-              src={imageError ? '/placeholder-car.jpg' : normalizedCar.image}
-              alt={normalizedCar.name}
-              className="zoomed-image"
-              onClick={handleZoomedImageClick}
-              onMouseMove={handleZoomedImageMove}
-              style={{
-                transformOrigin: `${zoomPosition.x}% ${zoomPosition.y}%`
-              }}
-            />
-            <div className="zoom-controls">
+          <div className="image-modal">
+            <div className="modal-header">
+              <h3>{normalizedCar.name}</h3>
               <button 
-                className="zoom-close-btn"
-                onClick={handleZoomedImageClick}
+                className="modal-close-btn"
+                onClick={handleCloseModal}
               >
                 ✕
               </button>
-              <div className="zoom-hint">Scroll to zoom • Click to close</div>
+            </div>
+            <div className="modal-image-container">
+              <img 
+                src={imageError ? '/placeholder-car.jpg' : normalizedCar.image}
+                alt={normalizedCar.name}
+                className="modal-image"
+              />
+            </div>
+            <div className="modal-footer">
+              <p className="car-type">{normalizedCar.type}</p>
+              <p className="car-price">From ${normalizedCar.price}/day</p>
             </div>
           </div>
         </div>

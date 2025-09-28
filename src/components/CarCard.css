@@ -7,6 +7,8 @@
   transition: all 0.3s ease;
   position: relative;
   border: 1px solid #f0f0f0;
+  width: 100%;
+  max-width: 360px;
 }
 
 .car-card:hover {
@@ -19,19 +21,28 @@
   background: #f8f9fa;
 }
 
-.car-image {
+.car-image-container {
   position: relative;
-  height: 200px;
+  height: 220px; /* Increased height for larger image */
   overflow: hidden;
-  cursor: zoom-in;
+  cursor: pointer;
   transition: transform 0.2s ease;
+  background: #f8f9fa;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.car-image:hover {
+.car-image-container:hover {
   transform: scale(1.02);
 }
 
-.car-image.loading {
+.car-image-container:hover .image-view-hint {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.car-image-container.loading {
   background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
   background-size: 200% 100%;
   animation: loading 1.5s infinite;
@@ -46,11 +57,38 @@
   }
 }
 
-.car-image img {
+.car-image-wrapper {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5px; /* Reduced padding to maximize image space */
+}
+
+.car-image {
+  width: 90%; /* Increased width percentage */
+  height: 90%; /* Increased height percentage */
+  object-fit: contain; /* Ensures whole car is visible */
+  object-position: center;
   transition: transform 0.3s ease;
+}
+
+.image-view-hint {
+  position: absolute;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%) translateY(10px);
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  padding: 6px 12px;
+  border-radius: 16px;
+  font-size: 12px;
+  font-weight: 500;
+  opacity: 0;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+  pointer-events: none;
 }
 
 .premium-badge {
@@ -69,6 +107,7 @@
   font-weight: bold;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
   pointer-events: none;
+  z-index: 2;
 }
 
 .car-status {
@@ -85,6 +124,7 @@
   font-weight: bold;
   color: white;
   pointer-events: none;
+  z-index: 2;
 }
 
 .car-status.available {
@@ -113,6 +153,7 @@
   font-weight: bold;
   font-size: 14px;
   pointer-events: none;
+  z-index: 1;
 }
 
 .car-info {
@@ -332,107 +373,147 @@
   opacity: 0.8;
 }
 
-/* Image Zoom Styles */
-.image-zoom-overlay {
+/* Image Modal Styles */
+.image-modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.9);
-  backdrop-filter: blur(10px);
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(8px);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 2000;
-  animation: zoom-fade-in 0.3s ease-out;
+  animation: modal-fade-in 0.3s ease-out;
+  padding: 20px;
 }
 
-@keyframes zoom-fade-in {
+@keyframes modal-fade-in {
   from {
     opacity: 0;
     backdrop-filter: blur(0px);
   }
   to {
     opacity: 1;
-    backdrop-filter: blur(10px);
+    backdrop-filter: blur(8px);
   }
 }
 
-.zoomed-image-container {
-  position: relative;
-  max-width: 90vw;
-  max-height: 90vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.zoomed-image {
-  max-width: 100%;
-  max-height: 100%;
-  object-fit: contain;
-  cursor: zoom-out;
-  transition: transform 0.1s ease;
-  border-radius: 8px;
+.image-modal {
+  background: white;
+  border-radius: 16px;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  max-width: 600px; /* Slightly wider modal for better image display */
+  width: 100%;
+  max-height: 90vh;
+  overflow: hidden;
+  animation: modal-slide-up 0.3s ease-out;
 }
 
-.zoomed-image:hover {
-  transform: scale(1.02);
+@keyframes modal-slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-.zoom-controls {
-  position: absolute;
-  top: 20px;
-  right: 20px;
+.modal-header {
   display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 10px;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px 0;
+  margin-bottom: 16px;
 }
 
-.zoom-close-btn {
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: white;
-  width: 40px;
-  height: 40px;
+.modal-header h3 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+  color: #1d1d1f;
+}
+
+.modal-close-btn {
+  background: #f0f0f0;
+  border: none;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 300;
-  backdrop-filter: blur(10px);
+  color: #515154;
   transition: all 0.2s ease;
 }
 
-.zoom-close-btn:hover {
-  background: rgba(255, 255, 255, 0.2);
+.modal-close-btn:hover {
+  background: #e5e5e5;
   transform: scale(1.1);
 }
 
-.zoom-hint {
-  color: rgba(255, 255, 255, 0.7);
-  font-size: 14px;
-  background: rgba(0, 0, 0, 0.5);
-  padding: 8px 12px;
-  border-radius: 6px;
-  backdrop-filter: blur(10px);
-  animation: hint-fade 2s ease-in-out;
+.modal-image-container {
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  max-height: 450px; /* Increased modal image height */
+  overflow: hidden;
+  background: #f8f9fa;
+  border-radius: 8px;
+  margin: 0 24px;
 }
 
-@keyframes hint-fade {
-  0%, 100% { opacity: 0.7; }
-  50% { opacity: 1; }
+.modal-image {
+  max-width: 100%;
+  max-height: 450px; /* Increased modal image height */
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  object-position: center;
+}
+
+.modal-footer {
+  padding: 16px 24px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid #f0f0f0;
+  margin-top: 16px;
+}
+
+.modal-footer .car-type {
+  margin: 0;
+  font-size: 14px;
+  color: #86868b;
+}
+
+.modal-footer .car-price {
+  margin: 0;
+  font-size: 18px;
+  color: #007aff;
 }
 
 /* Responsive Design */
 @media (max-width: 768px) {
+  .car-card {
+    max-width: 100%;
+  }
+  
+  .car-image-container {
+    height: 200px; /* Adjusted mobile height */
+  }
+  
   .car-image {
-    height: 180px;
+    width: 85%; /* Slightly smaller on mobile to ensure fit */
+    height: 85%;
   }
   
   .car-info {
@@ -455,13 +536,66 @@
     flex-direction: column;
   }
   
-  .zoom-controls {
-    top: 10px;
-    right: 10px;
+  .image-modal {
+    max-width: 100%;
+    margin: 20px;
   }
   
-  .zoom-hint {
-    font-size: 12px;
-    padding: 6px 10px;
+  .modal-header {
+    padding: 16px 20px 0;
+  }
+  
+  .modal-image-container {
+    padding: 0 20px;
+    max-height: 350px; /* Adjusted for mobile */
+    margin: 0 20px;
+  }
+  
+  .modal-image {
+    max-height: 350px; /* Adjusted for mobile */
+  }
+  
+  .modal-footer {
+    padding: 12px 20px 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .car-image-container {
+    height: 180px; /* Slightly smaller for very small screens */
+  }
+  
+  .car-image {
+    width: 80%;
+    height: 80%;
+  }
+  
+  .modal-header h3 {
+    font-size: 18px;
+  }
+  
+  .modal-image-container {
+    max-height: 300px;
+  }
+  
+  .modal-image {
+    max-height: 300px;
+  }
+  
+  .modal-footer {
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-start;
+  }
+}
+
+/* Additional optimization for very tall images */
+@media (max-height: 700px) {
+  .modal-image-container {
+    max-height: 300px;
+  }
+  
+  .modal-image {
+    max-height: 300px;
   }
 }
