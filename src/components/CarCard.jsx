@@ -7,6 +7,8 @@ const CarCard = ({ car, currentRental, onRentalUpdate }) => {
   const [imageError, setImageError] = useState(false);
   const [timeRemaining, setTimeRemaining] = useState('');
   const [localRental, setLocalRental] = useState(currentRental);
+  const [isImageZoomed, setIsImageZoomed] = useState(false);
+  const [zoomPosition, setZoomPosition] = useState({ x: 0, y: 0 });
   const navigate = useNavigate();
 
   // Normalize car data to handle different structures
@@ -45,6 +47,24 @@ const CarCard = ({ car, currentRental, onRentalUpdate }) => {
         onRentalUpdate(rentalData);
       }
     }
+  };
+
+  // Image zoom handlers
+  const handleImageClick = (e) => {
+    e.stopPropagation();
+    setIsImageZoomed(true);
+  };
+
+  const handleZoomedImageClick = (e) => {
+    e.stopPropagation();
+    setIsImageZoomed(false);
+  };
+
+  const handleZoomedImageMove = (e) => {
+    const { left, top, width, height } = e.target.getBoundingClientRect();
+    const x = ((e.clientX - left) / width) * 100;
+    const y = ((e.clientY - top) / height) * 100;
+    setZoomPosition({ x, y });
   };
 
   // Time remaining calculation
@@ -127,98 +147,133 @@ const CarCard = ({ car, currentRental, onRentalUpdate }) => {
   const activeRental = localRental || currentRental;
 
   return (
-    <div className={`car-card ${isRented ? 'rented' : ''}`}>
-      <div className={`car-image ${!imageLoaded && !imageError ? 'loading' : ''}`}>
-        <img 
-          src={imageError ? '/placeholder-car.jpg' : normalizedCar.image} 
-          alt={normalizedCar.name}
-          onLoad={handleImageLoad}
-          onError={handleImageError}
-        />
-        {isPremium && (
-          <div className="premium-badge">P</div>
-        )}
-        <div className={`car-status ${isRented ? 'rented' : normalizedCar.available ? 'available' : 'unavailable'}`}>
-          {isRented ? 'RENTED' : normalizedCar.available ? 'A' : 'X'}
-        </div>
-        {isRented && <div className="rented-overlay">CURRENTLY RENTED</div>}
-      </div>
-      
-      <div className="car-info">
-        <h3>{normalizedCar.name}</h3>
-        <p className="car-type">{normalizedCar.type}</p>
-        <p className="car-price">From ${normalizedCar.price}/day</p>
-        <p className="car-description">{normalizedCar.description}</p>
-        
-        {/* Rental Information Display */}
-        {isRented && activeRental && (
-          <div className="rental-info">
-            <div className="rental-message">
-              <strong>Rented by: {activeRental.customerName}</strong>
-            </div>
-            <div className="rental-dates">
-              <div className="rental-date-item">
-                <span className="date-label">Start:</span>
-                <span className="date-value">{formatRentalDate(activeRental.rentalStartTime)}</span>
-              </div>
-              <div className="rental-date-item">
-                <span className="date-label">End:</span>
-                <span className="date-value">{formatRentalDate(activeRental.rentalEndTime)}</span>
-              </div>
-              <div className="rental-date-item">
-                <span className="date-label">Duration:</span>
-                <span className="date-value">{activeRental.rentalDays} days</span>
-              </div>
-            </div>
-            <div className="time-remaining-section">
-              <span className="time-remaining-label">Time until return:</span>
-              <span className="time-remaining-value">{timeRemaining}</span>
-            </div>
+    <>
+      <div className={`car-card ${isRented ? 'rented' : ''}`}>
+        <div 
+          className={`car-image ${!imageLoaded && !imageError ? 'loading' : ''}`}
+          onClick={handleImageClick}
+        >
+          <img 
+            src={imageError ? '/placeholder-car.jpg' : normalizedCar.image} 
+            alt={normalizedCar.name}
+            onLoad={handleImageLoad}
+            onError={handleImageError}
+          />
+          {isPremium && (
+            <div className="premium-badge">P</div>
+          )}
+          <div className={`car-status ${isRented ? 'rented' : normalizedCar.available ? 'available' : 'unavailable'}`}>
+            {isRented ? 'RENTED' : normalizedCar.available ? 'A' : 'X'}
           </div>
-        )}
+          {isRented && <div className="rented-overlay">CURRENTLY RENTED</div>}
+        </div>
         
-        {features.length > 0 && (
-          <div className="car-features">
-            {features.slice(0, 3).map((feature, index) => (
-              <span key={index} className="feature-tag">{feature}</span>
-            ))}
-            {features.length > 3 && (
-              <span className="feature-tag">+{features.length - 3} more</span>
+        <div className="car-info">
+          <h3>{normalizedCar.name}</h3>
+          <p className="car-type">{normalizedCar.type}</p>
+          <p className="car-price">From ${normalizedCar.price}/day</p>
+          <p className="car-description">{normalizedCar.description}</p>
+          
+          {/* Rental Information Display */}
+          {isRented && activeRental && (
+            <div className="rental-info">
+              <div className="rental-message">
+                <strong>Rented by: {activeRental.customerName}</strong>
+              </div>
+              <div className="rental-dates">
+                <div className="rental-date-item">
+                  <span className="date-label">Start:</span>
+                  <span className="date-value">{formatRentalDate(activeRental.rentalStartTime)}</span>
+                </div>
+                <div className="rental-date-item">
+                  <span className="date-label">End:</span>
+                  <span className="date-value">{formatRentalDate(activeRental.rentalEndTime)}</span>
+                </div>
+                <div className="rental-date-item">
+                  <span className="date-label">Duration:</span>
+                  <span className="date-value">{activeRental.rentalDays} days</span>
+                </div>
+              </div>
+              <div className="time-remaining-section">
+                <span className="time-remaining-label">Time until return:</span>
+                <span className="time-remaining-value">{timeRemaining}</span>
+              </div>
+            </div>
+          )}
+          
+          {features.length > 0 && (
+            <div className="car-features">
+              {features.slice(0, 3).map((feature, index) => (
+                <span key={index} className="feature-tag">{feature}</span>
+              ))}
+              {features.length > 3 && (
+                <span className="feature-tag">+{features.length - 3} more</span>
+              )}
+            </div>
+          )}
+          
+          <div className="car-action">
+            <button 
+              className={`rent-btn ${isRented ? 'disabled' : normalizedCar.available ? 'available' : 'unavailable'}`}
+              onClick={handleRentClick}
+              disabled={!normalizedCar.available || isRented}
+            >
+              {isRented ? 'CURRENTLY RENTED' : (normalizedCar.available ? 'RENT NOW' : 'NOT AVAILABLE')}
+            </button>
+            
+            {isRented && (
+              <button 
+                className="return-btn"
+                onClick={() => navigate(`/return-car/${normalizedCar.id}`)}
+              >
+                RETURN CAR
+              </button>
             )}
           </div>
-        )}
-        
-        <div className="car-action">
-          <button 
-            className={`rent-btn ${isRented ? 'disabled' : normalizedCar.available ? 'available' : 'unavailable'}`}
-            onClick={handleRentClick}
-            disabled={!normalizedCar.available || isRented}
-          >
-            {isRented ? 'CURRENTLY RENTED' : (normalizedCar.available ? 'RENT NOW' : 'NOT AVAILABLE')}
-          </button>
           
-          {isRented && (
-            <button 
-              className="return-btn"
-              onClick={() => navigate(`/return-car/${normalizedCar.id}`)}
-            >
-              RETURN CAR
-            </button>
+          {/* Rental Confirmation Message */}
+          {isRented && activeRental && (
+            <div className="rental-confirmation-message">
+              <div className="confirmation-icon">✓</div>
+              <div className="confirmation-text">
+                <strong>RENTAL CONFIRMED!</strong>
+                <span>Your rental is active until {formatRentalDate(activeRental.rentalEndTime)}</span>
+              </div>
+            </div>
           )}
         </div>
-        
-        {/* Rental Confirmation Message */}
-        {isRented && activeRental && (
-          <div className="rental-confirmation-message">
-            <div className="confirmation-icon">✓</div>
-            <div className="confirmation-text">
-              <strong>RENTAL CONFIRMED!</strong>
-              <span>Your rental is active until {formatRentalDate(activeRental.rentalEndTime)}</span>
+      </div>
+
+      {/* Image Zoom Overlay */}
+      {isImageZoomed && (
+        <div 
+          className="image-zoom-overlay" 
+          onClick={handleZoomedImageClick}
+        >
+          <div className="zoomed-image-container">
+            <img 
+              src={imageError ? '/placeholder-car.jpg' : normalizedCar.image}
+              alt={normalizedCar.name}
+              className="zoomed-image"
+              onClick={handleZoomedImageClick}
+              onMouseMove={handleZoomedImageMove}
+              style={{
+                transformOrigin: `${zoomPosition.x}% ${zoomPosition.y}%`
+              }}
+            />
+            <div className="zoom-controls">
+              <button 
+                className="zoom-close-btn"
+                onClick={handleZoomedImageClick}
+              >
+                ✕
+              </button>
+              <div className="zoom-hint">Scroll to zoom • Click to close</div>
             </div>
           </div>
-        )}
-      </div>
-    </div>
+        </div>
+      )}
+    </>
   );
 };
 
