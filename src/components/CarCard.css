@@ -41,6 +41,11 @@
   transform: translateY(-4px) scale(1.01);
 }
 
+.car-card.rented {
+  border: 2px solid rgba(239, 68, 68, 0.3);
+  background: rgba(254, 242, 242, 0.95);
+}
+
 /* Car Image Styles */
 .car-image {
   position: relative;
@@ -89,10 +94,6 @@
   color: #0f172a;
   margin-bottom: 0.5rem;
   line-height: 1.3;
-  background: linear-gradient(135deg, #0f172a 0%, #334155 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
 }
 
 .car-type {
@@ -113,10 +114,6 @@
   font-weight: 800;
   color: #10b981;
   margin-bottom: 1rem;
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
   line-height: 1;
 }
 
@@ -125,8 +122,6 @@
   font-size: 1rem;
   font-weight: 600;
   color: #64748b;
-  background: none;
-  -webkit-text-fill-color: initial;
 }
 
 .car-description {
@@ -178,15 +173,154 @@
   color: white;
 }
 
-.car-status.unavailable {
+.car-status.rented {
   background: linear-gradient(135deg, #ef4444, #dc2626);
   color: white;
 }
 
-/* Action Button */
+.car-status.unavailable {
+  background: linear-gradient(135deg, #6b7280, #4b5563);
+  color: white;
+}
+
+/* Premium Badge */
+.premium-badge {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  color: white;
+  padding: 0.4rem 1rem;
+  border-radius: 12px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
+  z-index: 3;
+}
+
+/* Rented Overlay */
+.rented-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(239, 68, 68, 0.1);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #dc2626;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* Rental Information Styles */
+.rental-info {
+  background: rgba(59, 130, 246, 0.05);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  border-radius: 12px;
+  padding: 1.25rem;
+  margin-bottom: 1.5rem;
+  backdrop-filter: blur(10px);
+}
+
+.rental-message {
+  font-weight: 600;
+  color: #1e40af;
+  margin-bottom: 1rem;
+  font-size: 0.95rem;
+}
+
+.rental-dates {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.rental-date-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.85rem;
+}
+
+.date-label {
+  color: #64748b;
+  font-weight: 500;
+}
+
+.date-value {
+  color: #1e293b;
+  font-weight: 600;
+}
+
+.time-remaining-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+.time-remaining-label {
+  color: #64748b;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.time-remaining-value {
+  color: #dc2626;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+/* Rental Confirmation Message */
+.rental-confirmation-message {
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
+  padding: 1rem;
+  border-radius: 12px;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+}
+
+.confirmation-icon {
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.confirmation-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.confirmation-text strong {
+  font-size: 0.9rem;
+}
+
+.confirmation-text span {
+  font-size: 0.8rem;
+  opacity: 0.9;
+}
+
+/* Action Buttons */
 .car-action {
   margin-top: auto;
   padding-top: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
 }
 
 .rent-btn {
@@ -205,13 +339,13 @@
   overflow: hidden;
 }
 
-.rent-btn:hover {
+.rent-btn:hover:not(:disabled) {
   transform: translateY(-2px);
   box-shadow: 0 8px 30px rgba(59, 130, 246, 0.4);
   background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
 }
 
-.rent-btn:active {
+.rent-btn:active:not(:disabled) {
   transform: translateY(0);
 }
 
@@ -220,6 +354,18 @@
   cursor: not-allowed;
   transform: none;
   box-shadow: none;
+}
+
+.rent-btn.available {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+}
+
+.rent-btn.unavailable {
+  background: linear-gradient(135deg, #94a3b8, #64748b);
+}
+
+.rent-btn.disabled {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
 }
 
 .rent-btn::before {
@@ -236,25 +382,80 @@
   transition: left 0.6s ease;
 }
 
-.rent-btn:hover::before {
+.rent-btn:hover:not(:disabled)::before {
   left: 100%;
 }
 
-/* Premium Badge */
-.premium-badge {
-  position: absolute;
-  top: 1rem;
-  left: 1rem;
-  background: linear-gradient(135deg, #f59e0b, #d97706);
+.return-btn {
+  width: 100%;
+  padding: 1rem 2rem;
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  border: none;
+  border-radius: 16px;
   color: white;
-  padding: 0.4rem 1rem;
-  border-radius: 12px;
-  font-size: 0.7rem;
   font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
-  z-index: 3;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 20px rgba(239, 68, 68, 0.3);
+}
+
+.return-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(239, 68, 68, 0.4);
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+}
+
+.return-btn:active {
+  transform: translateY(0);
+}
+
+/* Loading State for Image */
+.car-image.loading {
+  background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Focus States for Accessibility */
+.car-card:focus-within {
+  outline: 2px solid #3b82f6;
+  outline-offset: 4px;
+  border-radius: 28px;
+}
+
+.rent-btn:focus,
+.return-btn:focus {
+  outline: 2px solid white;
+  outline-offset: 2px;
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+  .car-card,
+  .car-image img,
+  .rent-btn,
+  .return-btn {
+    transition: none;
+  }
+  
+  .car-card:hover {
+    transform: none;
+  }
+  
+  .car-card:hover .car-image img {
+    transform: none;
+  }
+  
+  .rent-btn:hover:not(:disabled),
+  .return-btn:hover {
+    transform: none;
+  }
 }
 
 /* Responsive Design */
@@ -279,6 +480,16 @@
   .car-price {
     font-size: 1.8rem;
   }
+  
+  .rental-dates {
+    gap: 0.75rem;
+  }
+  
+  .rental-date-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+  }
 }
 
 @media (max-width: 480px) {
@@ -293,128 +504,59 @@
   .car-price {
     font-size: 1.6rem;
   }
-}
-
-/* Loading State for Image */
-.car-image.loading {
-  background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
-  background-size: 200% 100%;
-  animation: loading 1.5s infinite;
-}
-
-@keyframes loading {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
-}
-
-/* Focus States for Accessibility */
-.car-card:focus-within {
-  outline: 2px solid #3b82f6;
-  outline-offset: 4px;
-  border-radius: 28px;
-}
-
-.rent-btn:focus {
-  outline: 2px solid white;
-  outline-offset: 2px;
-}
-
-/* Reduced Motion Support */
-@media (prefers-reduced-motion: reduce) {
-  .car-card,
-  .car-image img,
-  .rent-btn {
-    transition: none;
+  
+  .rental-info {
+    padding: 1rem;
   }
   
-  .car-card:hover {
-    transform: none;
+  .time-remaining-section {
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: flex-start;
   }
   
-  .car-card:hover .car-image img {
-    transform: none;
+  .car-action {
+    gap: 0.5rem;
+  }
+  
+  .rent-btn,
+  .return-btn {
+    padding: 0.875rem 1.5rem;
+    font-size: 0.9rem;
   }
 }
 
-/* Rental Modal Styles */
-.rental-modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.7);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
+/* High Contrast Mode Support */
+@media (prefers-contrast: high) {
+  .car-card {
+    background: white;
+    border: 2px solid #000;
+  }
+  
+  .car-card.rented {
+    border-color: #c00;
+    background: #fff0f0;
+  }
+  
+  .feature-tag {
+    background: #e3f2fd;
+    border-color: #2196f3;
+    color: #000;
+  }
 }
 
-.rental-modal {
-  background: white;
-  padding: 2rem;
-  border-radius: 10px;
-  max-width: 500px;
-  width: 90%;
-  max-height: 80vh;
-  overflow-y: auto;
-}
-
-.form-group {
-  margin-bottom: 1rem;
-}
-
-.form-group label {
-  display: block;
-  margin-bottom: 0.5rem;
-  font-weight: bold;
-}
-
-.form-group input {
-  width: 100%;
-  padding: 0.5rem;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-}
-
-.form-actions {
-  display: flex;
-  gap: 1rem;
-  justify-content: flex-end;
-  margin-top: 1.5rem;
-}
-
-/* Countdown Styles */
-.rental-countdown {
-  background: #f8f9fa;
-  padding: 1rem;
-  border-radius: 5px;
-  margin: 1rem 0;
-}
-
-.countdown-timer {
-  font-size: 1.5rem;
-  font-weight: bold;
-  color: #e74c3c;
-}
-
-.rental-completed {
-  background: #27ae60;
-  color: white;
-  padding: 0.5rem;
-  border-radius: 5px;
-  text-align: center;
-}
-
-.return-btn {
-  background: #e74c3c;
-  color: white;
-  border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-.rental-active {
-  border: 2px solid #3498db;
+/* Print Styles */
+@media print {
+  .car-card {
+    background: white;
+    box-shadow: none;
+    border: 1px solid #000;
+  }
+  
+  .rent-btn,
+  .return-btn,
+  .premium-badge,
+  .car-status {
+    display: none;
+  }
 }
