@@ -1,122 +1,349 @@
-/* Add these to your existing CarCard.css */
+/* CarForm.css - Apple Design System */
 
-.rental-dates {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  margin: 8px 0;
-}
-
-.rental-date-item {
-  display: flex;
-  justify-content: space-between;
-  font-size: 0.9em;
-}
-
-.date-label {
-  font-weight: 600;
-  color: #666;
-}
-
-.date-value {
-  color: #333;
-}
-
-.time-remaining-section {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: #fff3cd;
-  padding: 8px;
-  border-radius: 4px;
-  margin: 8px 0;
-  border-left: 4px solid #ffc107;
-}
-
-.time-remaining-label {
-  font-weight: 600;
-  color: #856404;
-}
-
-.time-remaining-value {
-  font-weight: bold;
-  color: #856404;
-}
-
-.rental-total {
-  text-align: center;
-  font-weight: bold;
-  color: #28a745;
-  background: #d4edda;
-  padding: 6px;
-  border-radius: 4px;
-  margin-top: 8px;
-}
-
-.rental-confirmation-message {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  background: #d4edda;
-  border: 1px solid #c3e6cb;
-  border-radius: 8px;
-  padding: 12px;
-  margin-top: 12px;
-  animation: slideIn 0.5s ease-out;
-}
-
-.confirmation-icon {
-  background: #28a745;
-  color: white;
-  border-radius: 50%;
-  width: 24px;
-  height: 24px;
+.car-form-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(8px);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: bold;
+  z-index: 1000;
+  padding: 20px;
+  animation: overlay-appear 0.3s ease-out;
 }
 
-.confirmation-text {
-  display: flex;
-  flex-direction: column;
-}
-
-.confirmation-text strong {
-  color: #155724;
-}
-
-.confirmation-text span {
-  font-size: 0.9em;
-  color: #155724;
-}
-
-@keyframes slideIn {
+@keyframes overlay-appear {
   from {
     opacity: 0;
-    transform: translateY(-10px);
+    backdrop-filter: blur(0px);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
+    backdrop-filter: blur(8px);
   }
 }
 
-/* Enhanced rented state styles */
-.car-card.rented {
-  border: 2px solid #ffc107;
-  box-shadow: 0 4px 12px rgba(255, 193, 7, 0.3);
+.car-form-modal {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  border-radius: 12px;
+  box-shadow: 
+    0 20px 60px rgba(0, 0, 0, 0.1),
+    0 0 0 1px rgba(255, 255, 255, 0.1);
+  width: 100%;
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+  animation: modal-appear 0.4s cubic-bezier(0.23, 1, 0.32, 1);
 }
 
-.rented-overlay {
+@keyframes modal-appear {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.car-form-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px 24px 0;
+  margin-bottom: 8px;
+}
+
+.car-form-header h2 {
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+  font-size: 22px;
+  font-weight: 600;
+  color: #1d1d1f;
+  margin: 0;
+  letter-spacing: -0.24px;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 24px;
+  font-weight: 300;
+  color: #86868b;
+  cursor: pointer;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.close-btn:hover:not(:disabled) {
+  background-color: rgba(0, 0, 0, 0.06);
+  color: #1d1d1f;
+  transform: scale(1.1);
+}
+
+.close-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.car-form {
+  padding: 0 24px 24px;
+}
+
+.form-section {
+  margin-bottom: 32px;
+}
+
+.section-title {
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif;
+  font-size: 17px;
+  font-weight: 600;
+  color: #1d1d1f;
+  margin: 0 0 16px 0;
+  letter-spacing: -0.18px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-label {
+  display: block;
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+  color: #1d1d1f;
+  margin-bottom: 6px;
+  letter-spacing: -0.16px;
+}
+
+.form-input,
+.form-select,
+.form-textarea {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid #d2d2d7;
+  border-radius: 8px;
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif;
+  font-size: 15px;
+  color: #1d1d1f;
+  background-color: #ffffff;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+
+.form-input:focus,
+.form-select:focus,
+.form-textarea:focus {
+  outline: none;
+  border-color: #007AFF;
+  box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+  transform: translateY(-1px);
+}
+
+.form-input:hover:not(:focus):not(:disabled),
+.form-select:hover:not(:focus):not(:disabled),
+.form-textarea:hover:not(:focus):not(:disabled) {
+  border-color: #86868b;
+}
+
+.form-input:disabled,
+.form-select:disabled,
+.form-textarea:disabled {
+  background-color: #f5f5f7;
+  color: #86868b;
+  cursor: not-allowed;
+}
+
+.form-textarea {
+  resize: vertical;
+  min-height: 80px;
+  line-height: 1.4;
+}
+
+.form-input.error,
+.form-select.error {
+  border-color: #ff3b30;
+  box-shadow: 0 0 0 3px rgba(255, 59, 48, 0.1);
+}
+
+.error-text {
+  display: block;
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif;
+  font-size: 13px;
+  color: #ff3b30;
+  margin-top: 6px;
+  font-weight: 500;
+}
+
+.help-text {
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif;
+  font-size: 13px;
+  color: #86868b;
+  margin-top: 6px;
+  display: block;
+}
+
+/* Checkbox Styles */
+.checkbox-group {
+  margin-top: 8px;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif;
+  font-size: 15px;
+  color: #1d1d1f;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.checkbox-input {
+  display: none;
+}
+
+.checkbox-custom {
+  width: 20px;
+  height: 20px;
+  border: 2px solid #d2d2d7;
+  border-radius: 4px;
+  margin-right: 12px;
+  position: relative;
+  transition: all 0.2s ease;
+  background: white;
+}
+
+.checkbox-input:checked + .checkbox-custom {
+  background-color: #007AFF;
+  border-color: #007AFF;
+}
+
+.checkbox-input:checked + .checkbox-custom::after {
+  content: '✓';
   position: absolute;
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background: rgba(255, 193, 7, 0.9);
-  color: #856404;
-  padding: 8px 16px;
-  border-radius: 20px;
-  font-weight: bold;
-  font-size: 0.9em;
+}
+
+.checkbox-label:hover .checkbox-custom {
+  border-color: #007AFF;
+}
+
+.checkbox-input:disabled + .checkbox-custom {
+  background-color: #f5f5f7;
+  border-color: #d2d2d7;
+  cursor: not-allowed;
+}
+
+/* Button Styles */
+.form-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-top: 32px;
+  padding-top: 20px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.btn {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 980px;
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+  min-width: 80px;
+  letter-spacing: -0.16px;
+}
+
+.btn-primary {
+  background-color: #007AFF;
+  color: white;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background-color: #0056CC;
+  transform: scale(1.04);
+}
+
+.btn-primary:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.btn-secondary {
+  background-color: transparent;
+  color: #007AFF;
+  border: 1px solid #d2d2d7;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background-color: rgba(0, 122, 255, 0.06);
+  border-color: #007AFF;
+  transform: scale(1.04);
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+/* Scrollbar Styling */
+.car-form-modal::-webkit-scrollbar {
+  width: 8px;
+}
+
+.car-form-modal::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.car-form-modal::-webkit-scrollbar-thumb {
+  background: #d2d2d7;
+  border-radius: 4px;
+}
+
+.car-form-modal::-webkit-scrollbar-thumb:hover {
+  background: #86868b;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .car-form-overlay {
+    padding: 16px;
+  }
+  
+  .car-form-modal {
+    max-height: 95vh;
+  }
+  
+  .car-form-header,
+  .car-form {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+  
+  .form-actions {
+    flex-direction: column-reverse;
+  }
+  
+  .btn {
+    width: 100%;
+  }
 }
