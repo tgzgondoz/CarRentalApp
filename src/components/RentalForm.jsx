@@ -1,7 +1,28 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useCars } from '../hooks/useCars';
+import { db } from '../firebase/config';
+import { ref, push, update } from 'firebase/database';
 import './RentalForm.css';
+
+// Firebase configuration
+import { initializeApp } from "firebase/app";
+import { getAnalytics } from "firebase/analytics";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAdwEeVAvHU6cUxHCaIfcGY1VHXjUW6fow",
+  authDomain: "carrentalapp-b6862.firebaseapp.com",
+  databaseURL: "https://carrentalapp-b6862-default-rtdb.firebaseio.com",
+  projectId: "carrentalapp-b6862",
+  storageBucket: "carrentalapp-b6862.firebasestorage.app",
+  messagingSenderId: "722148486629",
+  appId: "1:722148486629:web:beaf5205c436d40e88530c",
+  measurementId: "G-NKT1P56X3K"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
 
 const RentalForm = () => {
   const { carId } = useParams();
@@ -16,16 +37,21 @@ const RentalForm = () => {
     phone: '',
     rentalDays: 1,
     startDate: new Date().toISOString().split('T')[0],
-    idFile: null,
-    licenseFile: null
+    idNumber: '',
+    licenseNumber: ''
   });
 
   useEffect(() => {
     if (cars && carId) {
       const foundCar = cars.find(c => c.id === carId);
+      if (foundCar && !foundCar.available) {
+        alert('This car is not available for rental!');
+        navigate('/cars');
+        return;
+      }
       setCar(foundCar);
     }
-  }, [cars, carId]);
+  }, [cars, carId, navigate]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -35,69 +61,106 @@ const RentalForm = () => {
     }));
   };
 
-  const handleFileChange = (e) => {
-    const { name, files } = e.target;
-    setRentalData(prev => ({
-      ...prev,
-      [name]: files[0]
-    }));
-  };
-
-  const uploadFileToFirebase = async (file, path) => {
-    // Implement Firebase Storage upload
-    try {
-      // const storageRef = ref(storage, path);
-      // const snapshot = await uploadBytes(storageRef, file);
-      // return await getDownloadURL(snapshot.ref);
-      return `https://example.com/${path}`;
-    } catch (error) {
-      console.error('Error uploading file:', error);
-      throw error;
+  const validateForm = () => {
+    const errors = [];
+    
+    if (!rentalData.customerName.trim()) {
+      errors.push('Please enter your full name');
     }
+    
+    if (!rentalData.email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
+      errors.push('Please enter a valid email address');
+    }
+    
+    if (!rentalData.phone.match(/^[\+]?[1-9][\d]{0,15}$/)) {
+      errors.push('Please enter a valid phone number');
+    }
+    
+    if (rentalData.rentalDays < 1 || rentalData.rentalDays > 30) {
+      errors.push('Rental days must be between 1 and 30');
+    }
+    
+    if (!rentalData.idNumber.trim()) {
+      errors.push('Please enter your ID number');
+    } else if (!/^[A-Za-z0-9\-]{8,20}$/.test(rentalData.idNumber)) {
+      errors.push('ID number must be 8-20 characters (letters, numbers, hyphens only)');
+    }
+    
+    if (!rentalData.licenseNumber.trim()) {
+      errors.push('Please enter your driver\'s license number');
+    } else if (!/^[A-Za-z0-9]{8,15}$/.test(rentalData.licenseNumber)) {
+      errors.push('License number must be 8-15 characters (letters and numbers only)');
+    }
+    
+    if (errors.length > 0) {
+      alert(errors.join('\n'));
+      return false;
+    }
+    
+    return true;
   };
 
   const handleSubmitRental = async (e) => {
     e.preventDefault();
-    if (!car) return;
+
+    if (!car || !car.available) {
+      alert('This car is not available for rental!');
+      return;
+    }
+
+    if (!validateForm()) {
+      return;
+    }
 
     setIsSubmitting(true);
 
     try {
-      // Upload files
-      let idFileUrl = '';
-      let licenseFileUrl = '';
-
-      if (rentalData.idFile) {
-        idFileUrl = await uploadFileToFirebase(rentalData.idFile, `ids/${carId}_${Date.now()}_id`);
-      }
-
-      if (rentalData.licenseFile) {
-        licenseFileUrl = await uploadFileToFirebase(rentalData.licenseFile, `licenses/${carId}_${Date.now()}_license`);
-      }
-
-      // Save rental record
+      // Create rental record
       const rentalRecord = {
         carId: carId,
         carName: car.name,
-        customerName: rentalData.customerName,
-        email: rentalData.email,
+        carImage: car.image || '',
+        carType: car.type || '',
+        customerName: rentalData.customerName.trim(),
+        email: rentalData.email.toLowerCase(),
         phone: rentalData.phone,
         rentalDays: parseInt(rentalData.rentalDays),
         startDate: rentalData.startDate,
         totalPrice: car.price * parseInt(rentalData.rentalDays),
-        idFileUrl,
-        licenseFileUrl,
+        idNumber: rentalData.idNumber.trim(),
+        licenseNumber: rentalData.licenseNumber.trim(),
+        rentalDate: new Date().toISOString(),
         rentalStartTime: new Date().toISOString(),
-        rentalEndTime: new Date(new Date(rentalData.startDate).getTime() + parseInt(rentalData.rentalDays) * 24 * 60 * 60 * 1000).toISOString(),
-        status: 'active'
+        rentalEndTime: new Date(new Date().getTime() + parseInt(rentalData.rentalDays) * 24 * 60 * 60 * 1000).toISOString(),
+        status: 'active',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
       };
 
-      // Save to Firebase
-      // await addDoc(collection(db, 'rentals'), rentalRecord);
-      // await updateDoc(doc(db, 'cars', carId), { available: false });
+      // Save rental record to Realtime Database
+      const rentalsRef = ref(db, 'rentals');
+      const newRentalRef = push(rentalsRef);
+      await update(newRentalRef, rentalRecord);
+      const rentalId = newRentalRef.key;
 
-      console.log('Rental submitted:', rentalRecord);
-      navigate(`/rental-confirmation/${carId}`, { state: { rentalRecord } });
+      // Update car availability
+      const carRef = ref(db, `cars/${carId}`);
+      await update(carRef, { 
+        available: false,
+        lastRented: new Date().toISOString(),
+        rentalId: rentalId
+      });
+
+      console.log('Rental submitted successfully with ID:', rentalId);
+      
+      navigate(`/rental-confirmation/${rentalId}`, { 
+        state: { 
+          rentalRecord: {
+            ...rentalRecord,
+            id: rentalId
+          } 
+        } 
+      });
 
     } catch (error) {
       console.error('Error submitting rental:', error);
@@ -123,6 +186,7 @@ const RentalForm = () => {
             <h2>{car.name}</h2>
             <p className="car-type">{car.type}</p>
             <p className="car-price">${car.price}/day</p>
+            <p className="availability" style={{color: 'green'}}>Available</p>
           </div>
         </div>
 
@@ -137,6 +201,7 @@ const RentalForm = () => {
               value={rentalData.customerName}
               onChange={handleInputChange}
               required
+              placeholder="Enter your full name"
             />
           </div>
 
@@ -148,6 +213,7 @@ const RentalForm = () => {
               value={rentalData.email}
               onChange={handleInputChange}
               required
+              placeholder="your@email.com"
             />
           </div>
 
@@ -159,12 +225,13 @@ const RentalForm = () => {
               value={rentalData.phone}
               onChange={handleInputChange}
               required
+              placeholder="+1234567890"
             />
           </div>
 
           <div className="form-row">
             <div className="form-group">
-              <label>Rental Days *</label>
+              <label>Rental Days (1-30) *</label>
               <input
                 type="number"
                 name="rentalDays"
@@ -190,25 +257,31 @@ const RentalForm = () => {
           </div>
 
           <div className="form-group">
-            <label>ID Document (PDF, JPG, PNG) *</label>
+            <label>ID Number *</label>
             <input
-              type="file"
-              name="idFile"
-              accept=".pdf,.jpg,.jpeg,.png"
-              onChange={handleFileChange}
+              type="text"
+              name="idNumber"
+              value={rentalData.idNumber}
+              onChange={handleInputChange}
               required
+              placeholder="Enter your government ID number"
+              maxLength="20"
             />
+            <small>8-20 characters (letters, numbers, hyphens only)</small>
           </div>
 
           <div className="form-group">
-            <label>Driver's License (PDF, JPG, PNG) *</label>
+            <label>Driver's License Number *</label>
             <input
-              type="file"
-              name="licenseFile"
-              accept=".pdf,.jpg,.jpeg,.png"
-              onChange={handleFileChange}
+              type="text"
+              name="licenseNumber"
+              value={rentalData.licenseNumber}
+              onChange={handleInputChange}
               required
+              placeholder="Enter your driver's license number"
+              maxLength="15"
             />
+            <small>8-15 characters (letters and numbers only)</small>
           </div>
 
           <div className="rental-summary">
@@ -228,6 +301,7 @@ const RentalForm = () => {
             <button 
               type="submit" 
               disabled={isSubmitting}
+              className="submit-btn"
             >
               {isSubmitting ? 'Processing...' : 'Confirm Rental'}
             </button>
