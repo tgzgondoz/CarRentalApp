@@ -1,4 +1,4 @@
-import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import Header from './components/Header';
 import Hero from './components/Hero';
@@ -14,7 +14,7 @@ import './App.css';
 function App() {
   return (
     <AuthProvider>
-      <HashRouter>
+      <Router>
         <div className="App">
           <Routes>
             {/* Public Routes with Header & Footer */}
@@ -25,7 +25,7 @@ function App() {
             <Route path="/admin" element={<ProtectedRoute><AdminPanel /></ProtectedRoute>} />
           </Routes>
         </div>
-      </HashRouter>
+      </Router>
     </AuthProvider>
   );
 }
