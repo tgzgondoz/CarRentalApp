@@ -4,9 +4,81 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>DriveEasy - Car Rental</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      
+      body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      
+      .splash-container {
+        text-align: center;
+        color: white;
+        animation: fadeIn 1s ease-in;
+      }
+      
+      .logo {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+      }
+      
+      h1 {
+        font-size: 3rem;
+        margin-bottom: 0.5rem;
+        font-weight: 700;
+      }
+      
+      .tagline {
+        font-size: 1.3rem;
+        margin-bottom: 2rem;
+        opacity: 0.9;
+      }
+      
+      .cta-button {
+        background: white;
+        color: #667eea;
+        padding: 1rem 2rem;
+        font-size: 1.1rem;
+        border: none;
+        border-radius: 50px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: transform 0.3s, box-shadow 0.3s;
+      }
+      
+      .cta-button:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+      }
+      
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(-20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+    </style>
   </head>
   <body>
-    <div id="root"></div>
+    <div class="splash-container">
+      <div class="logo">🚗</div>
+      <h1>DriveEasy</h1>
+      <p class="tagline">Your Journey, Our Priority</p>
+      <button class="cta-button">Get Started</button>
+    </div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
