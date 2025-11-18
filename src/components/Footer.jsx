@@ -70,15 +70,15 @@ const Footer = () => {
             <div className="contact-info">
               <div className="contact-item">
                 <span className="contact-icon">📧</span>
-                <span>info@driveeasy.com</span>
+                <span>tgzgondozz@gmail.com</span>
               </div>
               <div className="contact-item">
                 <span className="contact-icon">📞</span>
-                <span>(859) 123-4567</span>
+                <span>(263) 783 242 506</span>
               </div>
               <div className="contact-item">
                 <span className="contact-icon">📍</span>
-                <span>123 Drive Street, Auto City, AC 12345</span>
+                <span>7805 Kubatana Karoi Surbub </span>
               </div>
               <div className="contact-item">
                 <span className="contact-icon">🕒</span>
