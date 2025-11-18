@@ -46,10 +46,10 @@ const Footer = () => {
             <h3>DriveEasy</h3>
             <p>Your trusted partner for premium car rentals since 2004. Experience luxury, reliability, and exceptional service with our extensive fleet of premium vehicles.</p>
             <div className="social-links">
-              <a href="#" className="social-link" aria-label="Facebook">📘</a>
-              <a href="#" className="social-link" aria-label="Twitter">🐦</a>
+              <a href="#" className="social-link" aria-label="Facebook">f</a>
+              <a href="#" className="social-link" aria-label="Twitter">𝕏</a>
               <a href="#" className="social-link" aria-label="Instagram">📷</a>
-              <a href="#" className="social-link" aria-label="LinkedIn">💼</a>
+              <a href="#" className="social-link" aria-label="LinkedIn">in</a>
             </div>
           </div>
           
@@ -69,19 +69,19 @@ const Footer = () => {
             <h4>Contact Info</h4>
             <div className="contact-info">
               <div className="contact-item">
-                <span className="contact-icon">📧</span>
+                <span className="contact-icon">✉</span>
                 <span>tgzgondozz@gmail.com</span>
               </div>
               <div className="contact-item">
-                <span className="contact-icon">📞</span>
+                <span className="contact-icon">☎</span>
                 <span>(263) 783 242 506</span>
               </div>
               <div className="contact-item">
                 <span className="contact-icon">📍</span>
-                <span>7805 Kubatana Karoi Surbub </span>
+                <span>7805 Kubatana Karoi Surbub</span>
               </div>
               <div className="contact-item">
-                <span className="contact-icon">🕒</span>
+                <span className="contact-icon">⏰</span>
                 <span>24/7 Customer Support</span>
               </div>
             </div>
@@ -89,7 +89,7 @@ const Footer = () => {
         </div>
         
         <div className="footer-bottom">
-          <p>&copy; 2024 DriveEasy. All rights reserved. | <a href="#privacy">Privacy Policy</a> | <a href="#terms">Terms of Service</a></p>
+          <p>&copy; 2025 DriveEasy. All rights reserved. | <a href="#privacy">Privacy Policy</a> | <a href="#terms">Terms of Service</a></p>
         </div>
       </div>
     </footer>
