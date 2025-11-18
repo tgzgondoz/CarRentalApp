@@ -119,6 +119,9 @@
         const splashScreen = document.getElementById('splashScreen');
         const root = document.getElementById('root');
         
+        // Get the current path to determine where to navigate
+        const currentPath = window.location.pathname;
+        
         // Load main.jsx after 2 seconds (splash screen duration)
         setTimeout(() => {
           // Hide splash screen
@@ -131,6 +134,19 @@
           document.head.appendChild(script);
           
           console.log('DriveEasy app loaded successfully!');
+          console.log('Current path:', currentPath);
+          
+          // If we're not already on /admin/login and want to open it directly,
+          // you can either:
+          // Option 1: Change the URL (recommended)
+          if (!currentPath.includes('/admin/login')) {
+            window.history.replaceState(null, '', '/admin/login');
+          }
+          
+          // Option 2: Or if you want to keep the current URL but ensure the React app
+          // handles the routing correctly, let React Router handle it
+          // The React app will read the current URL and render the appropriate component
+          
         }, 2000); // 2 second splash screen
       });
     </script>
