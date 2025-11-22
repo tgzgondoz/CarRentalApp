@@ -5,7 +5,6 @@ import { useCars } from '../hooks/useCars';
 import { db } from '../firebase/config';
 import { ref, onValue, off, update } from 'firebase/database';
 import CarForm from './CarForm';
-import './AdminPanel.css';
 
 const AdminPanel = () => {
   const { logout, currentUser } = useAuth();
@@ -188,18 +187,43 @@ const AdminPanel = () => {
   });
 
   if (loading && cars.length === 0) {
-    return <div className="loading">Loading...</div>;
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div className="admin-panel">
-      <div className="admin-header">
-        <h1>Admin Panel</h1>
-        <div className="admin-actions">
-          <span>Welcome, {currentUser?.email}</span>
-          <button onClick={handleAddNew} className="btn btn-primary">Add New Car</button>
-          <button onClick={handleBackToSite} className="btn btn-secondary">Back to Site</button>
-          <button onClick={logout} className="btn btn-danger">Logout</button>
+    <div className="min-h-screen bg-gray-50 p-4">
+      {/* Header */}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+          <h1 className="text-3xl font-bold text-gray-900">Admin Panel</h1>
+          <div className="flex flex-wrap items-center gap-3">
+            <span className="text-gray-600 text-sm">Welcome, {currentUser?.email}</span>
+            <button 
+              onClick={handleAddNew}
+              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors duration-200 font-medium"
+            >
+              Add New Car
+            </button>
+            <button 
+              onClick={handleBackToSite}
+              className="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors duration-200 font-medium"
+            >
+              Back to Site
+            </button>
+            <button 
+              onClick={logout}
+              className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors duration-200 font-medium"
+            >
+              Logout
+            </button>
+          </div>
         </div>
       </div>
 
@@ -212,60 +236,80 @@ const AdminPanel = () => {
       )}
 
       {/* Rental Statistics */}
-      <div className="rental-stats">
-        <div className="stat-card">
-          <h3>Total Cars</h3>
-          <span className="stat-number">{cars.length}</span>
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 text-center">
+          <h3 className="text-gray-600 text-sm font-medium mb-2">Total Cars</h3>
+          <span className="text-2xl font-bold text-gray-900">{cars.length}</span>
         </div>
-        <div className="stat-card">
-          <h3>Active Rentals</h3>
-          <span className="stat-number rented">{activeRentals.length}</span>
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 text-center">
+          <h3 className="text-gray-600 text-sm font-medium mb-2">Active Rentals</h3>
+          <span className="text-2xl font-bold text-orange-600">{activeRentals.length}</span>
         </div>
-        <div className="stat-card">
-          <h3>Completed Rentals</h3>
-          <span className="stat-number completed">{rentals.filter(r => r.status === 'completed').length}</span>
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 text-center">
+          <h3 className="text-gray-600 text-sm font-medium mb-2">Completed Rentals</h3>
+          <span className="text-2xl font-bold text-green-600">
+            {rentals.filter(r => r.status === 'completed').length}
+          </span>
         </div>
-        <div className="stat-card">
-          <h3>Available Cars</h3>
-          <span className="stat-number available">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 text-center">
+          <h3 className="text-gray-600 text-sm font-medium mb-2">Available Cars</h3>
+          <span className="text-2xl font-bold text-blue-600">
             {cars.filter(car => car.available && !activeRentals.find(r => r.carId === car.id)).length}
           </span>
         </div>
       </div>
 
       {/* Tab Navigation */}
-      <div className="admin-tabs">
-        <button 
-          className={`tab-btn ${activeTab === 'all' ? 'active' : ''}`}
-          onClick={() => setActiveTab('all')}
-        >
-          All Cars ({cars.length})
-        </button>
-        <button 
-          className={`tab-btn ${activeTab === 'rented' ? 'active' : ''}`}
-          onClick={() => setActiveTab('rented')}
-        >
-          Rented Cars ({activeRentals.length})
-        </button>
-        <button 
-          className={`tab-btn ${activeTab === 'available' ? 'active' : ''}`}
-          onClick={() => setActiveTab('available')}
-        >
-          Available Cars ({cars.filter(car => car.available && !activeRentals.find(r => r.carId === car.id)).length})
-        </button>
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 mb-6">
+        <div className="flex flex-wrap gap-2">
+          <button 
+            className={`px-4 py-2 rounded-lg font-medium transition-colors duration-200 ${
+              activeTab === 'all' 
+                ? 'bg-blue-600 text-white' 
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            }`}
+            onClick={() => setActiveTab('all')}
+          >
+            All Cars ({cars.length})
+          </button>
+          <button 
+            className={`px-4 py-2 rounded-lg font-medium transition-colors duration-200 ${
+              activeTab === 'rented' 
+                ? 'bg-orange-600 text-white' 
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            }`}
+            onClick={() => setActiveTab('rented')}
+          >
+            Rented Cars ({activeRentals.length})
+          </button>
+          <button 
+            className={`px-4 py-2 rounded-lg font-medium transition-colors duration-200 ${
+              activeTab === 'available' 
+                ? 'bg-green-600 text-white' 
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            }`}
+            onClick={() => setActiveTab('available')}
+          >
+            Available Cars ({cars.filter(car => car.available && !activeRentals.find(r => r.carId === car.id)).length})
+          </button>
+        </div>
       </div>
 
-      <div className="cars-list">
-        <h2>
+      {/* Cars List */}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
+        <h2 className="text-xl font-bold text-gray-900 mb-4">
           {activeTab === 'all' && 'All Cars'}
           {activeTab === 'rented' && 'Currently Rented Cars'}
           {activeTab === 'available' && 'Available Cars'}
         </h2>
         
         {rentalsLoading ? (
-          <div className="loading">Loading rental data...</div>
+          <div className="text-center py-8">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+            <p className="mt-2 text-gray-600">Loading rental data...</p>
+          </div>
         ) : (
-          <div className="cars-grid compact">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {filteredCars.map(car => {
               const isExpanded = expandedCards[car.id];
               const hasRental = !!car.rentalInfo;
@@ -273,103 +317,123 @@ const AdminPanel = () => {
               return (
                 <div 
                   key={car.id} 
-                  className={`admin-car-card compact ${hasRental ? 'rented' : ''} ${isExpanded ? 'expanded' : ''}`}
+                  className={`bg-white border rounded-xl shadow-sm transition-all duration-200 cursor-pointer ${
+                    hasRental ? 'border-orange-300 bg-orange-50' : 'border-gray-200'
+                  } ${isExpanded ? 'ring-2 ring-blue-500' : 'hover:shadow-md'}`}
                   onClick={() => !isExpanded && toggleCardExpansion(car.id)}
                 >
-                  <div className="card-header">
-                    <div className="car-image">
-                      <img 
-                        src={car.image || '/placeholder-car.jpg'} 
-                        alt={car.name}
-                        onError={(e) => {
-                          e.target.src = '/placeholder-car.jpg';
-                        }}
-                      />
-                      {hasRental && (
-                        <div className="rented-badge">RENTED</div>
-                      )}
-                    </div>
-                    
-                    <div className="car-basic-info">
-                      <h3>{car.name}</h3>
-                      <p className="car-type">{car.type}</p>
-                      <p className="car-price">${car.price}/day</p>
-                      <div className={`status-indicator ${hasRental ? 'rented' : car.available ? 'available' : 'unavailable'}`}>
-                        {hasRental ? 'Rented' : car.available ? 'Available' : 'Unavailable'}
+                  {/* Card Header */}
+                  <div className="p-4">
+                    <div className="flex items-start gap-4">
+                      <div className="relative flex-shrink-0">
+                        <img 
+                          src={car.image || '/placeholder-car.jpg'} 
+                          alt={car.name}
+                          className="w-20 h-16 object-cover rounded-lg"
+                          onError={(e) => {
+                            e.target.src = '/placeholder-car.jpg';
+                          }}
+                        />
+                        {hasRental && (
+                          <div className="absolute -top-2 -right-2 bg-orange-600 text-white text-xs px-2 py-1 rounded-full font-medium">
+                            RENTED
+                          </div>
+                        )}
                       </div>
+                      
+                      <div className="flex-grow min-w-0">
+                        <h3 className="font-semibold text-gray-900 truncate">{car.name}</h3>
+                        <p className="text-gray-600 text-sm">{car.type}</p>
+                        <p className="text-blue-600 font-medium">${car.price}/day</p>
+                        <div className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium mt-1 ${
+                          hasRental 
+                            ? 'bg-orange-100 text-orange-800' 
+                            : car.available 
+                              ? 'bg-green-100 text-green-800'
+                              : 'bg-red-100 text-red-800'
+                        }`}>
+                          {hasRental ? 'Rented' : car.available ? 'Available' : 'Unavailable'}
+                        </div>
+                      </div>
+                      
+                      <button 
+                        className={`flex-shrink-0 w-6 h-6 flex items-center justify-center text-gray-400 hover:text-gray-600 transition-colors duration-200 ${
+                          isExpanded ? 'transform rotate-180' : ''
+                        }`}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toggleCardExpansion(car.id);
+                        }}
+                      >
+                        ▼
+                      </button>
                     </div>
-                    
-                    <button 
-                      className={`expand-btn ${isExpanded ? 'expanded' : ''}`}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        toggleCardExpansion(car.id);
-                      }}
-                    >
-                      {isExpanded ? '▲' : '▼'}
-                    </button>
                   </div>
 
                   {/* Expanded Details */}
                   {isExpanded && (
-                    <div className="card-details">
+                    <div className="border-t border-gray-200 p-4">
                       {hasRental ? (
-                        <div className="rental-details">
-                          <div className="details-section">
-                            <h4>Rental Information</h4>
-                            <div className="details-grid">
-                              <div className="detail-item">
-                                <span className="detail-label">Customer:</span>
-                                <span className="detail-value">{car.rentalInfo.customerName}</span>
+                        <div className="space-y-4">
+                          <div>
+                            <h4 className="font-semibold text-gray-900 mb-3">Rental Information</h4>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                              <div>
+                                <span className="text-gray-600">Customer:</span>
+                                <span className="ml-2 font-medium">{car.rentalInfo.customerName}</span>
                               </div>
-                              <div className="detail-item">
-                                <span className="detail-label">Email:</span>
-                                <span className="detail-value">{car.rentalInfo.email}</span>
+                              <div>
+                                <span className="text-gray-600">Email:</span>
+                                <span className="ml-2 font-medium">{car.rentalInfo.email}</span>
                               </div>
-                              <div className="detail-item">
-                                <span className="detail-label">Contact:</span>
-                                <span className="detail-value">{car.rentalInfo.phone}</span>
+                              <div>
+                                <span className="text-gray-600">Contact:</span>
+                                <span className="ml-2 font-medium">{car.rentalInfo.phone}</span>
                               </div>
-                              <div className="detail-item">
-                                <span className="detail-label">ID Number:</span>
-                                <span className="detail-value">{car.rentalInfo.idNumber || 'N/A'}</span>
+                              <div>
+                                <span className="text-gray-600">ID Number:</span>
+                                <span className="ml-2 font-medium">{car.rentalInfo.idNumber || 'N/A'}</span>
                               </div>
-                              <div className="detail-item">
-                                <span className="detail-label">License:</span>
-                                <span className="detail-value">{car.rentalInfo.licenseNumber || 'N/A'}</span>
+                              <div>
+                                <span className="text-gray-600">License:</span>
+                                <span className="ml-2 font-medium">{car.rentalInfo.licenseNumber || 'N/A'}</span>
                               </div>
-                              <div className="detail-item">
-                                <span className="detail-label">Rental Period:</span>
-                                <span className="detail-value">{car.rentalInfo.rentalDays} days</span>
+                              <div>
+                                <span className="text-gray-600">Rental Period:</span>
+                                <span className="ml-2 font-medium">{car.rentalInfo.rentalDays} days</span>
                               </div>
-                              <div className="detail-item">
-                                <span className="detail-label">Start:</span>
-                                <span className="detail-value">{formatRentalDate(car.rentalInfo.rentalStartTime)}</span>
+                              <div>
+                                <span className="text-gray-600">Start:</span>
+                                <span className="ml-2 font-medium">{formatRentalDate(car.rentalInfo.rentalStartTime)}</span>
                               </div>
-                              <div className="detail-item">
-                                <span className="detail-label">End:</span>
-                                <span className="detail-value">{formatRentalDate(car.rentalInfo.rentalEndTime)}</span>
+                              <div>
+                                <span className="text-gray-600">End:</span>
+                                <span className="ml-2 font-medium">{formatRentalDate(car.rentalInfo.rentalEndTime)}</span>
                               </div>
-                              <div className="detail-item">
-                                <span className="detail-label">Time Remaining:</span>
-                                <span className="detail-value time-remaining">
+                              <div className="md:col-span-2">
+                                <span className="text-gray-600">Time Remaining:</span>
+                                <span className={`ml-2 font-medium ${
+                                  calculateTimeRemaining(car.rentalInfo.rentalEndTime).includes('expired') 
+                                    ? 'text-red-600' 
+                                    : 'text-orange-600'
+                                }`}>
                                   {calculateTimeRemaining(car.rentalInfo.rentalEndTime)}
                                 </span>
                               </div>
-                              <div className="detail-item total">
-                                <span className="detail-label">Total:</span>
-                                <span className="detail-value">${car.rentalInfo.totalPrice}</span>
+                              <div className="md:col-span-2 pt-2 border-t border-gray-200">
+                                <span className="text-gray-600 font-semibold">Total:</span>
+                                <span className="ml-2 font-bold text-lg text-green-600">${car.rentalInfo.totalPrice}</span>
                               </div>
                             </div>
                           </div>
 
-                          <div className="action-buttons">
+                          <div className="flex flex-wrap gap-2">
                             <button 
                               onClick={(e) => {
                                 e.stopPropagation();
                                 handleCompleteRental(car.rentalInfo.id, car.id);
                               }}
-                              className="btn btn-success btn-sm"
+                              className="bg-green-600 text-white px-3 py-2 rounded-lg hover:bg-green-700 transition-colors duration-200 text-sm font-medium"
                             >
                               Mark as Completed
                             </button>
@@ -378,25 +442,25 @@ const AdminPanel = () => {
                                 e.stopPropagation();
                                 navigate(`/rental-details/${car.rentalInfo.id}`);
                               }}
-                              className="btn btn-info btn-sm"
+                              className="bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-700 transition-colors duration-200 text-sm font-medium"
                             >
                               View Details
                             </button>
                           </div>
                         </div>
                       ) : (
-                        <div className="no-rental-info">
-                          <p>This car is currently available for rental.</p>
+                        <div className="text-center py-4">
+                          <p className="text-gray-600">This car is currently available for rental.</p>
                         </div>
                       )}
                       
-                      <div className="car-management-actions">
+                      <div className="flex flex-wrap gap-2 mt-4 pt-4 border-t border-gray-200">
                         <button 
                           onClick={(e) => {
                             e.stopPropagation();
                             handleEdit(car);
                           }}
-                          className="btn btn-primary btn-sm"
+                          className="bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-700 transition-colors duration-200 text-sm font-medium"
                         >
                           Edit Car
                         </button>
@@ -405,7 +469,7 @@ const AdminPanel = () => {
                             e.stopPropagation();
                             handleDelete(car.id);
                           }}
-                          className="btn btn-danger btn-sm"
+                          className="bg-red-600 text-white px-3 py-2 rounded-lg hover:bg-red-700 transition-colors duration-200 text-sm font-medium"
                         >
                           Delete Car
                         </button>
@@ -419,67 +483,77 @@ const AdminPanel = () => {
         )}
         
         {filteredCars.length === 0 && (
-          <div className="no-cars">
-            <p>No cars found for the selected filter.</p>
+          <div className="text-center py-8">
+            <p className="text-gray-600">No cars found for the selected filter.</p>
           </div>
         )}
       </div>
 
       {/* All Rentals Table */}
-      <div className="rentals-section">
-        <h2>All Rentals</h2>
-        <div className="rentals-table-container">
-          <table className="rentals-table">
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <h2 className="text-xl font-bold text-gray-900 mb-4">All Rentals</h2>
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-full">
             <thead>
-              <tr>
-                <th>Car</th>
-                <th>Customer</th>
-                <th>Contact</th>
-                <th>Period</th>
-                <th>Start Date</th>
-                <th>End Date</th>
-                <th>Total</th>
-                <th>Status</th>
-                <th>Actions</th>
+              <tr className="border-b border-gray-200">
+                <th className="text-left py-3 px-4 font-semibold text-gray-700">Car</th>
+                <th className="text-left py-3 px-4 font-semibold text-gray-700">Customer</th>
+                <th className="text-left py-3 px-4 font-semibold text-gray-700">Contact</th>
+                <th className="text-left py-3 px-4 font-semibold text-gray-700">Period</th>
+                <th className="text-left py-3 px-4 font-semibold text-gray-700">Start Date</th>
+                <th className="text-left py-3 px-4 font-semibold text-gray-700">End Date</th>
+                <th className="text-left py-3 px-4 font-semibold text-gray-700">Total</th>
+                <th className="text-left py-3 px-4 font-semibold text-gray-700">Status</th>
+                <th className="text-left py-3 px-4 font-semibold text-gray-700">Actions</th>
               </tr>
             </thead>
             <tbody>
               {rentals.map(rental => (
-                <tr key={rental.id} className={`status-${rental.status}`}>
-                  <td>
-                    <div className="car-info-small">
-                      <strong>{rental.carName}</strong>
-                      <small>{rental.carType}</small>
-                    </div>
-                  </td>
-                  <td>
+                <tr key={rental.id} className="border-b border-gray-100 hover:bg-gray-50">
+                  <td className="py-3 px-4">
                     <div>
-                      <strong>{rental.customerName}</strong>
-                      <small>{rental.email}</small>
+                      <div className="font-medium text-gray-900">{rental.carName}</div>
+                      <div className="text-sm text-gray-600">{rental.carType}</div>
                     </div>
                   </td>
-                  <td>{rental.phone}</td>
-                  <td>{rental.rentalDays} days</td>
-                  <td>{formatRentalDate(rental.rentalStartTime)}</td>
-                  <td>{formatRentalDate(rental.rentalEndTime)}</td>
-                  <td>${rental.totalPrice}</td>
-                  <td>
-                    <span className={`status-badge ${rental.status}`}>
+                  <td className="py-3 px-4">
+                    <div>
+                      <div className="font-medium text-gray-900">{rental.customerName}</div>
+                      <div className="text-sm text-gray-600">{rental.email}</div>
+                    </div>
+                  </td>
+                  <td className="py-3 px-4 text-gray-900">{rental.phone}</td>
+                  <td className="py-3 px-4 text-gray-900">{rental.rentalDays} days</td>
+                  <td className="py-3 px-4 text-gray-900 whitespace-nowrap">
+                    {formatRentalDate(rental.rentalStartTime)}
+                  </td>
+                  <td className="py-3 px-4 text-gray-900 whitespace-nowrap">
+                    {formatRentalDate(rental.rentalEndTime)}
+                  </td>
+                  <td className="py-3 px-4 font-semibold text-green-600">${rental.totalPrice}</td>
+                  <td className="py-3 px-4">
+                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                      rental.status === 'active' 
+                        ? 'bg-orange-100 text-orange-800'
+                        : rental.status === 'completed'
+                          ? 'bg-green-100 text-green-800'
+                          : 'bg-gray-100 text-gray-800'
+                    }`}>
                       {rental.status}
                     </span>
                   </td>
-                  <td>
-                    <div className="table-actions">
+                  <td className="py-3 px-4">
+                    <div className="flex gap-2">
                       <button 
                         onClick={() => navigate(`/rental-details/${rental.id}`)}
-                        className="btn btn-sm btn-info"
+                        className="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700 transition-colors duration-200"
                       >
                         View
                       </button>
                       {rental.status === 'active' && (
                         <button 
                           onClick={() => handleCompleteRental(rental.id, rental.carId)}
-                          className="btn btn-sm btn-success"
+                          className="bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700 transition-colors duration-200"
                         >
                           Complete
                         </button>
@@ -492,8 +566,8 @@ const AdminPanel = () => {
           </table>
           
           {rentals.length === 0 && !rentalsLoading && (
-            <div className="no-rentals">
-              <p>No rental records found.</p>
+            <div className="text-center py-8">
+              <p className="text-gray-600">No rental records found.</p>
             </div>
           )}
         </div>
