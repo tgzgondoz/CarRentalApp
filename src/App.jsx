@@ -8,6 +8,9 @@ import AdminLogin from './components/AdminLogin';
 import AdminPanel from './components/AdminPanel';
 import RentalForm from './components/RentalForm';
 import RentalConfirmation from './components/RentalConfirmation';
+import Cars from './components/Cars';
+import About from './components/About';
+import Contact from './components/Contact';
 import { useState } from 'react';
 import './App.css';
 
@@ -45,6 +48,15 @@ function PublicLayout() {
               <CarList searchTerm={searchTerm} />
             </>
           } />
+          
+          {/* Dedicated Cars Page */}
+          <Route path="/cars" element={<Cars />} />
+          
+          {/* About Page */}
+          <Route path="/about" element={<About />} />
+          
+          {/* Contact Page */}
+          <Route path="/contact" element={<Contact />} />
           
           {/* Rental Process Routes */}
           <Route path="/rent-car/:carId" element={<RentalForm />} />
