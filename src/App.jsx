@@ -18,14 +18,14 @@ function App() {
   return (
     <AuthProvider>
       <Router>
-        <div className="App">
+        <div className="App min-h-screen flex flex-col">
           <Routes>
             {/* Public Routes with Header & Footer */}
             <Route path="/*" element={<PublicLayout />} />
             
             {/* Admin Routes */}
             <Route path="/admin/login" element={<AdminLogin />} />
-            <Route path="/admin" element={<ProtectedRoute><AdminPanel /></ProtectedRoute>} />
+            <Route path="/admin/*" element={<ProtectedRoute><AdminPanel /></ProtectedRoute>} />
           </Routes>
         </div>
       </Router>
@@ -37,37 +37,59 @@ function PublicLayout() {
   const [searchTerm, setSearchTerm] = useState('');
 
   return (
-    <>
+    <div className="flex flex-col min-h-screen">
       <Header />
-      <main>
+      <main className="flex-grow">
         <Routes>
           {/* Homepage with Hero and CarList */}
           <Route path="/" element={
-            <>
+            <div className="w-full">
               <Hero onSearch={setSearchTerm} />
-              <CarList searchTerm={searchTerm} />
-            </>
+              <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
+                <CarList searchTerm={searchTerm} />
+              </div>
+            </div>
           } />
           
           {/* Dedicated Cars Page */}
-          <Route path="/cars" element={<Cars />} />
+          <Route path="/cars" element={
+            <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
+              <Cars />
+            </div>
+          } />
           
           {/* About Page */}
-          <Route path="/about" element={<About />} />
+          <Route path="/about" element={
+            <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
+              <About />
+            </div>
+          } />
           
           {/* Contact Page */}
-          <Route path="/contact" element={<Contact />} />
+          <Route path="/contact" element={
+            <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
+              <Contact />
+            </div>
+          } />
           
           {/* Rental Process Routes */}
-          <Route path="/rent-car/:carId" element={<RentalForm />} />
-          <Route path="/rental-confirmation/:carId" element={<RentalConfirmation />} />
+          <Route path="/rent-car/:carId" element={
+            <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
+              <RentalForm />
+            </div>
+          } />
+          <Route path="/rental-confirmation/:carId" element={
+            <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
+              <RentalConfirmation />
+            </div>
+          } />
           
           {/* Catch all route - redirect to home */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>
       <Footer />
-    </>
+    </div>
   );
 }
 

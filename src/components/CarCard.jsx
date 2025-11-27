@@ -33,37 +33,6 @@ const CarCard = ({ car, currentRental, onRentalUpdate }) => {
     }
   }, [currentRental]);
 
-  // Handle rental confirmation
-  const handleRentalConfirmation = (rentalData) => {
-    if (rentalData.carId === normalizedCar.id) {
-      setLocalRental({
-        ...rentalData,
-        status: 'active'
-      });
-      
-      if (onRentalUpdate) {
-        onRentalUpdate(rentalData);
-      }
-    }
-  };
-
-  // Image modal handlers
-  const handleImageClick = (e) => {
-    e.stopPropagation();
-    setShowImageModal(true);
-  };
-
-  const handleCloseModal = (e) => {
-    e.stopPropagation();
-    setShowImageModal(false);
-  };
-
-  const handleModalClick = (e) => {
-    if (e.target === e.currentTarget) {
-      setShowImageModal(false);
-    }
-  };
-
   // Time remaining calculation
   useEffect(() => {
     let interval;
@@ -85,9 +54,9 @@ const CarCard = ({ car, currentRental, onRentalUpdate }) => {
           const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
           
           if (days > 0) {
-            setTimeRemaining(`${days}d ${hours}h ${minutes}m remaining`);
+            setTimeRemaining(`${days}d ${hours}h ${minutes}m`);
           } else {
-            setTimeRemaining(`${hours}h ${minutes}m remaining`);
+            setTimeRemaining(`${hours}h ${minutes}m`);
           }
         }
       }, 60000);
@@ -101,9 +70,9 @@ const CarCard = ({ car, currentRental, onRentalUpdate }) => {
       const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
       
       if (days > 0) {
-        setTimeRemaining(`${days}d ${hours}h ${minutes}m remaining`);
+        setTimeRemaining(`${days}d ${hours}h ${minutes}m`);
       } else {
-        setTimeRemaining(`${hours}h ${minutes}m remaining`);
+        setTimeRemaining(`${hours}h ${minutes}m`);
       }
     }
 
@@ -133,7 +102,6 @@ const CarCard = ({ car, currentRental, onRentalUpdate }) => {
 
   const formatRentalDate = (dateString) => {
     return new Date(dateString).toLocaleDateString('en-US', {
-      weekday: 'short',
       month: 'short',
       day: 'numeric',
       hour: '2-digit',
@@ -143,14 +111,33 @@ const CarCard = ({ car, currentRental, onRentalUpdate }) => {
 
   const activeRental = localRental || currentRental;
 
+  // Image modal handlers
+  const handleImageClick = (e) => {
+    e.stopPropagation();
+    setShowImageModal(true);
+  };
+
+  const handleCloseModal = (e) => {
+    e.stopPropagation();
+    setShowImageModal(false);
+  };
+
+  const handleModalClick = (e) => {
+    if (e.target === e.currentTarget) {
+      setShowImageModal(false);
+    }
+  };
+
   return (
     <>
       <div className={`bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden transition-all duration-300 hover:shadow-md ${
         isRented ? 'ring-2 ring-orange-500 bg-orange-50' : ''
       }`}>
-        {/* Image Container */}
+        {/* Image Container - Responsive */}
         <div 
-          className={`relative cursor-pointer group ${!imageLoaded && !imageError ? 'bg-gray-200 animate-pulse' : ''}`}
+          className={`relative cursor-pointer group ${
+            !imageLoaded && !imageError ? 'bg-gray-200 animate-pulse' : ''
+          }`}
           onClick={handleImageClick}
         >
           <div className="aspect-w-16 aspect-h-9 overflow-hidden">
@@ -159,19 +146,19 @@ const CarCard = ({ car, currentRental, onRentalUpdate }) => {
               alt={normalizedCar.name}
               onLoad={handleImageLoad}
               onError={handleImageError}
-              className="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105"
+              className="w-full h-40 xs:h-44 sm:h-48 md:h-52 object-cover transition-transform duration-300 group-hover:scale-105"
             />
           </div>
           
-          {/* Premium Badge */}
+          {/* Premium Badge - Responsive */}
           {isPremium && (
-            <div className="absolute top-3 left-3 w-8 h-8 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full flex items-center justify-center text-white font-bold text-sm shadow-lg">
+            <div className="absolute top-2 left-2 xs:top-3 xs:left-3 w-6 h-6 xs:w-7 xs:h-7 sm:w-8 sm:h-8 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full flex items-center justify-center text-white font-bold text-xs xs:text-sm shadow-lg">
               P
             </div>
           )}
           
-          {/* Status Indicator */}
-          <div className={`absolute top-3 right-3 w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold shadow-lg ${
+          {/* Status Indicator - Responsive */}
+          <div className={`absolute top-2 right-2 xs:top-3 xs:right-3 w-6 h-6 xs:w-7 xs:h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-white text-xs font-bold shadow-lg ${
             isRented 
               ? 'bg-orange-500' 
               : normalizedCar.available 
@@ -183,41 +170,52 @@ const CarCard = ({ car, currentRental, onRentalUpdate }) => {
           
           {/* Rented Overlay */}
           {isRented && (
-            <div className="absolute inset-0 bg-orange-600 bg-opacity-90 flex items-center justify-center">
-              <div className="text-white text-lg font-bold text-center">
-                <div>CURRENTLY RENTED</div>
-                <div className="text-sm font-normal mt-1">Click to view details</div>
+            <div className="absolute inset-0 bg-orange-600 bg-opacity-90 flex items-center justify-center p-3">
+              <div className="text-white text-center">
+                <div className="text-sm xs:text-base sm:text-lg font-bold">CURRENTLY RENTED</div>
+                <div className="text-xs xs:text-sm font-normal mt-1 opacity-90">Click to view details</div>
               </div>
             </div>
           )}
           
           {/* View Hint */}
-          <div className="absolute bottom-3 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-70 text-white text-xs px-3 py-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+          <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-70 text-white text-xs px-2 xs:px-3 py-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">
             Click to view
           </div>
         </div>
         
-        {/* Car Info */}
-        <div className="p-4">
-          <h3 className="font-semibold text-gray-900 text-lg mb-1">{normalizedCar.name}</h3>
-          <p className="text-gray-600 text-sm mb-2">{normalizedCar.type}</p>
-          <p className="text-blue-600 font-bold text-lg mb-3">From ${normalizedCar.price}/day</p>
-          <p className="text-gray-700 text-sm mb-4 line-clamp-2">{normalizedCar.description}</p>
+        {/* Car Info - Responsive Padding */}
+        <div className="p-3 xs:p-4 sm:p-5">
+          {/* Title and Type */}
+          <div className="mb-2 xs:mb-3">
+            <h3 className="font-semibold text-gray-900 text-base xs:text-lg sm:text-xl mb-1 line-clamp-1">
+              {normalizedCar.name}
+            </h3>
+            <p className="text-gray-600 text-sm xs:text-base mb-2">{normalizedCar.type}</p>
+            <p className="text-blue-600 font-bold text-lg xs:text-xl sm:text-2xl mb-2 xs:mb-3">
+              From ${normalizedCar.price}/day
+            </p>
+          </div>
+
+          {/* Description */}
+          <p className="text-gray-700 text-xs xs:text-sm mb-3 xs:mb-4 line-clamp-2">
+            {normalizedCar.description}
+          </p>
           
           {/* Rental Information Display */}
           {isRented && activeRental && (
-            <div className="bg-orange-50 border border-orange-200 rounded-lg p-3 mb-4">
-              <div className="text-orange-800 font-semibold text-sm mb-2">
+            <div className="bg-orange-50 border border-orange-200 rounded-lg p-2 xs:p-3 mb-3 xs:mb-4">
+              <div className="text-orange-800 font-semibold text-xs xs:text-sm mb-1 xs:mb-2">
                 Rented by: {activeRental.customerName}
               </div>
               <div className="space-y-1 text-xs text-orange-700">
                 <div className="flex justify-between">
                   <span>Start:</span>
-                  <span className="font-medium">{formatRentalDate(activeRental.rentalStartTime)}</span>
+                  <span className="font-medium text-right">{formatRentalDate(activeRental.rentalStartTime)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>End:</span>
-                  <span className="font-medium">{formatRentalDate(activeRental.rentalEndTime)}</span>
+                  <span className="font-medium text-right">{formatRentalDate(activeRental.rentalEndTime)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Duration:</span>
@@ -226,7 +224,7 @@ const CarCard = ({ car, currentRental, onRentalUpdate }) => {
               </div>
               <div className="mt-2 pt-2 border-t border-orange-200">
                 <div className="flex justify-between text-xs">
-                  <span className="text-orange-800">Time until return:</span>
+                  <span className="text-orange-800">Time remaining:</span>
                   <span className={`font-semibold ${
                     timeRemaining.includes('expired') ? 'text-red-600' : 'text-orange-600'
                   }`}>
@@ -237,13 +235,13 @@ const CarCard = ({ car, currentRental, onRentalUpdate }) => {
             </div>
           )}
           
-          {/* Features */}
+          {/* Features - Responsive */}
           {features.length > 0 && (
-            <div className="flex flex-wrap gap-1 mb-4">
+            <div className="flex flex-wrap gap-1 xs:gap-2 mb-3 xs:mb-4">
               {features.slice(0, 3).map((feature, index) => (
                 <span 
                   key={index}
-                  className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full"
+                  className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full whitespace-nowrap"
                 >
                   {feature}
                 </span>
@@ -256,10 +254,10 @@ const CarCard = ({ car, currentRental, onRentalUpdate }) => {
             </div>
           )}
           
-          {/* Action Buttons */}
-          <div className="space-y-2">
+          {/* Action Buttons - Responsive */}
+          <div className="space-y-2 xs:space-y-3">
             <button 
-              className={`w-full py-3 px-4 rounded-lg font-semibold transition-all duration-200 ${
+              className={`w-full py-2 xs:py-3 px-3 xs:px-4 rounded-lg font-semibold text-sm xs:text-base transition-all duration-200 min-h-[44px] ${
                 isRented 
                   ? 'bg-gray-400 text-gray-700 cursor-not-allowed' 
                   : normalizedCar.available 
@@ -274,7 +272,7 @@ const CarCard = ({ car, currentRental, onRentalUpdate }) => {
             
             {isRented && (
               <button 
-                className="w-full py-2 px-4 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition-colors duration-200"
+                className="w-full py-2 xs:py-3 px-3 xs:px-4 bg-green-600 text-white rounded-lg font-semibold text-sm xs:text-base hover:bg-green-700 transition-colors duration-200 min-h-[44px]"
                 onClick={() => navigate(`/return-car/${normalizedCar.id}`)}
               >
                 RETURN CAR
@@ -284,14 +282,14 @@ const CarCard = ({ car, currentRental, onRentalUpdate }) => {
           
           {/* Rental Confirmation Message */}
           {isRented && activeRental && (
-            <div className="mt-3 p-3 bg-green-50 border border-green-200 rounded-lg flex items-start gap-3">
-              <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center text-white text-sm font-bold flex-shrink-0">
+            <div className="mt-2 xs:mt-3 p-2 xs:p-3 bg-green-50 border border-green-200 rounded-lg flex items-start gap-2 xs:gap-3">
+              <div className="w-5 h-5 xs:w-6 xs:h-6 bg-green-500 rounded-full flex items-center justify-center text-white text-xs xs:text-sm font-bold flex-shrink-0 mt-0.5">
                 ✓
               </div>
-              <div className="flex-1">
-                <div className="font-semibold text-green-800 text-sm">RENTAL CONFIRMED!</div>
-                <div className="text-green-700 text-xs">
-                  Your rental is active until {formatRentalDate(activeRental.rentalEndTime)}
+              <div className="flex-1 min-w-0">
+                <div className="font-semibold text-green-800 text-xs xs:text-sm">RENTAL CONFIRMED!</div>
+                <div className="text-green-700 text-xs truncate">
+                  Active until {formatRentalDate(activeRental.rentalEndTime)}
                 </div>
               </div>
             </div>
@@ -299,32 +297,36 @@ const CarCard = ({ car, currentRental, onRentalUpdate }) => {
         </div>
       </div>
 
-      {/* Image Modal */}
+      {/* Image Modal - Responsive */}
       {showImageModal && (
         <div 
-          className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4"
+          className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-3 xs:p-4 sm:p-6"
           onClick={handleModalClick}
         >
-          <div className="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-hidden">
-            <div className="flex items-center justify-between p-4 border-b border-gray-200">
-              <h3 className="font-semibold text-gray-900 text-lg">{normalizedCar.name}</h3>
+          <div className="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-hidden mx-auto">
+            <div className="flex items-center justify-between p-3 xs:p-4 border-b border-gray-200">
+              <h3 className="font-semibold text-gray-900 text-base xs:text-lg sm:text-xl truncate pr-2">
+                {normalizedCar.name}
+              </h3>
               <button 
-                className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-600 transition-colors duration-200"
+                className="w-8 h-8 xs:w-10 xs:h-10 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-600 transition-colors duration-200 flex-shrink-0"
                 onClick={handleCloseModal}
               >
                 ✕
               </button>
             </div>
-            <div className="p-4 max-h-[60vh] overflow-auto">
+            <div className="p-3 xs:p-4 max-h-[60vh] overflow-auto">
               <img 
                 src={imageError ? '/placeholder-car.jpg' : normalizedCar.image}
                 alt={normalizedCar.name}
-                className="w-full h-auto rounded-lg"
+                className="w-full h-auto rounded-lg max-w-full"
               />
             </div>
-            <div className="p-4 border-t border-gray-200 bg-gray-50">
-              <p className="text-gray-600 text-sm">{normalizedCar.type}</p>
-              <p className="text-blue-600 font-bold text-lg">From ${normalizedCar.price}/day</p>
+            <div className="p-3 xs:p-4 border-t border-gray-200 bg-gray-50">
+              <p className="text-gray-600 text-sm xs:text-base">{normalizedCar.type}</p>
+              <p className="text-blue-600 font-bold text-lg xs:text-xl sm:text-2xl">
+                From ${normalizedCar.price}/day
+              </p>
             </div>
           </div>
         </div>
