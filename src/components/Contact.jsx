@@ -15,50 +15,50 @@ const Contact = () => {
   const contactMethods = [
     {
       icon: '📞',
-      title: 'Phone',
-      details: '+1 (555) 123-4567',
-      description: 'Mon-Fri from 8am to 6pm',
-      link: 'tel:+15551234567'
+      title: 'Concierge Line',
+      details: '+1 (555) 867-5309',
+      description: 'Priority assistance Mon-Sun, 6am to 11pm EST',
+      link: 'tel:+15558675309'
     },
     {
       icon: '✉️',
-      title: 'Email',
-      details: 'hello@driveeasy.com',
-      description: 'We reply within 24 hours',
-      link: 'mailto:hello@driveeasy.com'
+      title: 'Executive Email',
+      details: 'concierge@driveeasy.com',
+      description: 'Guaranteed response within 2 hours',
+      link: 'mailto:concierge@driveeasy.com'
     },
     {
       icon: '📍',
-      title: 'Office',
-      details: '123 Drive Street, City, State 12345',
-      description: 'Visit our headquarters',
+      title: 'Flagship Location',
+      details: 'One Premium Plaza, Suite 2500',
+      description: 'By appointment only - valet parking included',
       link: 'https://maps.google.com'
     },
     {
-      icon: '💬',
-      title: 'Live Chat',
-      details: 'Start chatting',
-      description: 'Available 24/7 for urgent matters',
-      link: '#chat'
+      icon: '💎',
+      title: 'VIP Service',
+      details: 'Dedicated Manager',
+      description: 'Personalized assistance for elite clients',
+      link: '#vip'
     }
   ];
 
   const faqs = [
     {
-      question: 'What documents do I need to rent a car?',
-      answer: 'You need a valid driver\'s license, credit card, and proof of insurance. International renters may need additional documentation.'
+      question: 'What documents are required for premium vehicle rental?',
+      answer: 'We require a valid driver\'s license, primary credit card, and proof of insurance. For luxury and exotic vehicles, additional verification and security deposit may apply.'
     },
     {
-      question: 'What is your cancellation policy?',
-      answer: 'You can cancel free of charge up to 24 hours before your rental period starts. Late cancellations may incur a fee.'
+      question: 'What is your cancellation policy for premium bookings?',
+      answer: 'Premium reservations can be cancelled up to 48 hours prior without penalty. Within 48 hours, a 50% fee applies. VIP bookings have flexible cancellation terms.'
     },
     {
-      question: 'Do you offer long-term rentals?',
-      answer: 'Yes, we offer discounted rates for rentals longer than 30 days. Contact us for custom long-term rental packages.'
+      question: 'Do you offer chauffeur services?',
+      answer: 'Yes, we provide professional chauffeur services for all our premium vehicles. Advanced booking of 72 hours is recommended for executive chauffeur assignments.'
     },
     {
-      question: 'Are there any age restrictions?',
-      answer: 'Renters must be at least 21 years old. Drivers under 25 may be subject to a young driver fee.'
+      question: 'What are your vehicle delivery options?',
+      answer: 'We offer white-glove delivery service to airports, hotels, and residences within our service area. Same-day delivery available for VIP clients.'
     }
   ];
 
@@ -92,25 +92,40 @@ const Contact = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Hero Section */}
-      <section className="bg-gradient-to-r from-blue-600 to-blue-800 text-white py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-white">
+      {/* Premium Hero Section */}
+      <section className="relative bg-gradient-to-br from-gray-900 via-blue-900 to-indigo-900 text-white py-24 overflow-hidden">
+        {/* Background Pattern */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute inset-0" style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Ccircle cx='30' cy='30' r='1'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+          }}></div>
+        </div>
+        
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <h1 className="text-4xl md:text-5xl font-bold mb-6">Get in Touch</h1>
-            <p className="text-xl text-blue-100 max-w-2xl mx-auto">
-              Have questions about our vehicles or services? We're here to help you find the perfect ride.
+            {/* Premium Badge */}
+            <div className="inline-flex items-center px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 mb-8">
+              <span className="w-2 h-2 bg-emerald-400 rounded-full mr-2 animate-pulse"></span>
+              <span className="text-sm font-medium text-white/90">PRIORITY SUPPORT</span>
+            </div>
+
+            <h1 className="text-5xl md:text-7xl font-bold mb-8 bg-gradient-to-r from-white to-blue-200 bg-clip-text text-transparent">
+              Concierge Access
+            </h1>
+            <p className="text-xl text-blue-100 max-w-3xl mx-auto leading-relaxed">
+              Your gateway to unparalleled service. Experience white-glove treatment with our dedicated team of mobility specialists, available to craft your perfect driving experience.
             </p>
           </div>
         </div>
       </section>
 
-      {/* Contact Methods */}
-      <section className="py-16 bg-white">
+      {/* Premium Contact Methods */}
+      <section className="py-20 bg-gradient-to-b from-gray-50 to-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Multiple Ways to Reach Us</h2>
-            <p className="text-gray-600">Choose the method that works best for you</p>
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">Executive Communication Channels</h2>
+            <p className="text-gray-600 text-lg">Multiple pathways to premium service excellence</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -118,48 +133,65 @@ const Contact = () => {
               <a
                 key={index}
                 href={method.link}
-                className="bg-white p-6 rounded-xl shadow-lg border border-gray-100 hover:shadow-xl hover:border-blue-200 transition-all duration-300 group text-center"
+                className="group bg-white/80 backdrop-blur-sm p-8 rounded-2xl shadow-lg hover:shadow-2xl border border-gray-100 hover:border-blue-200 transition-all duration-500 hover:transform hover:-translate-y-2 text-center"
               >
-                <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-blue-600 transition-colors">
+                <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-6 text-white group-hover:scale-110 transition-transform duration-300 shadow-lg">
                   <span className="text-2xl">{method.icon}</span>
                 </div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">{method.title}</h3>
-                <p className="text-blue-600 font-medium mb-1">{method.details}</p>
-                <p className="text-gray-500 text-sm">{method.description}</p>
+                <h3 className="text-xl font-bold text-gray-900 mb-3">{method.title}</h3>
+                <p className="text-blue-600 font-semibold text-lg mb-2">{method.details}</p>
+                <p className="text-gray-600 text-sm leading-relaxed">{method.description}</p>
               </a>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Contact Form & Info */}
-      <section className="py-16 bg-gray-50">
+      {/* Premium Contact Form & Info */}
+      <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-            {/* Contact Form */}
-            <div className="bg-white rounded-2xl shadow-lg p-8">
-              <h2 className="text-2xl font-bold text-gray-900 mb-6">Send us a Message</h2>
+            {/* Premium Contact Form */}
+            <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl border border-gray-100 p-10">
+              <div className="flex items-center justify-between mb-8">
+                <h2 className="text-3xl font-bold text-gray-900">Executive Inquiry Form</h2>
+                <div className="text-sm text-gray-500 bg-gray-50 px-3 py-1 rounded-full">
+                  Secure & Encrypted
+                </div>
+              </div>
               
               {submitStatus === 'success' && (
-                <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
-                  <p className="text-green-800 font-medium">
-                    ✅ Thank you! Your message has been sent successfully. We'll get back to you within 24 hours.
-                  </p>
+                <div className="mb-8 p-6 bg-gradient-to-r from-green-50 to-emerald-50 border border-emerald-200 rounded-2xl">
+                  <div className="flex items-center">
+                    <div className="w-12 h-12 bg-emerald-500 rounded-full flex items-center justify-center mr-4">
+                      <span className="text-2xl text-white">✓</span>
+                    </div>
+                    <div>
+                      <p className="text-emerald-800 font-semibold text-lg">Message Received</p>
+                      <p className="text-emerald-700">Your inquiry has been prioritized. An executive consultant will contact you within 30 minutes.</p>
+                    </div>
+                  </div>
                 </div>
               )}
 
               {submitStatus === 'error' && (
-                <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-                  <p className="text-red-800 font-medium">
-                    ❌ Sorry, there was an error sending your message. Please try again or contact us directly.
-                  </p>
+                <div className="mb-8 p-6 bg-gradient-to-r from-red-50 to-pink-50 border border-red-200 rounded-2xl">
+                  <div className="flex items-center">
+                    <div className="w-12 h-12 bg-red-500 rounded-full flex items-center justify-center mr-4">
+                      <span className="text-2xl text-white">!</span>
+                    </div>
+                    <div>
+                      <p className="text-red-800 font-semibold text-lg">Transmission Error</p>
+                      <p className="text-red-700">Please try again or contact our concierge line directly for immediate assistance.</p>
+                    </div>
+                  </div>
                 </div>
               )}
 
-              <form onSubmit={handleSubmit} className="space-y-6">
+              <form onSubmit={handleSubmit} className="space-y-8">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
+                    <label htmlFor="name" className="block text-sm font-semibold text-gray-700 mb-3">
                       Full Name *
                     </label>
                     <input
@@ -169,12 +201,12 @@ const Contact = () => {
                       value={formData.name}
                       onChange={handleChange}
                       required
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                      placeholder="John Doe"
+                      className="w-full px-5 py-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 bg-white/50 backdrop-blur-sm"
+                      placeholder="Johnathan Smith"
                     />
                   </div>
                   <div>
-                    <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                    <label htmlFor="email" className="block text-sm font-semibold text-gray-700 mb-3">
                       Email Address *
                     </label>
                     <input
@@ -184,16 +216,16 @@ const Contact = () => {
                       value={formData.email}
                       onChange={handleChange}
                       required
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                      placeholder="john@example.com"
+                      className="w-full px-5 py-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 bg-white/50 backdrop-blur-sm"
+                      placeholder="johnathan@enterprise.com"
                     />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">
-                      Phone Number
+                    <label htmlFor="phone" className="block text-sm font-semibold text-gray-700 mb-3">
+                      Direct Line
                     </label>
                     <input
                       type="tel"
@@ -201,13 +233,13 @@ const Contact = () => {
                       name="phone"
                       value={formData.phone}
                       onChange={handleChange}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                      placeholder="+1 (555) 123-4567"
+                      className="w-full px-5 py-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 bg-white/50 backdrop-blur-sm"
+                      placeholder="+1 (555) 867-5309"
                     />
                   </div>
                   <div>
-                    <label htmlFor="subject" className="block text-sm font-medium text-gray-700 mb-2">
-                      Subject *
+                    <label htmlFor="subject" className="block text-sm font-semibold text-gray-700 mb-3">
+                      Inquiry Type *
                     </label>
                     <select
                       id="subject"
@@ -215,21 +247,21 @@ const Contact = () => {
                       value={formData.subject}
                       onChange={handleChange}
                       required
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                      className="w-full px-5 py-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 bg-white/50 backdrop-blur-sm"
                     >
-                      <option value="">Select a subject</option>
-                      <option value="general">General Inquiry</option>
-                      <option value="booking">Booking Question</option>
-                      <option value="support">Technical Support</option>
-                      <option value="partnership">Partnership</option>
-                      <option value="other">Other</option>
+                      <option value="">Select priority level</option>
+                      <option value="vip">VIP Concierge Service</option>
+                      <option value="executive">Executive Fleet Inquiry</option>
+                      <option value="chauffeur">Chauffeur Services</option>
+                      <option value="corporate">Corporate Account</option>
+                      <option value="partnership">Strategic Partnership</option>
                     </select>
                   </div>
                 </div>
 
                 <div>
-                  <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-2">
-                    Message *
+                  <label htmlFor="message" className="block text-sm font-semibold text-gray-700 mb-3">
+                    Detailed Requirements *
                   </label>
                   <textarea
                     id="message"
@@ -238,66 +270,81 @@ const Contact = () => {
                     onChange={handleChange}
                     required
                     rows="6"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors resize-vertical"
-                    placeholder="Tell us how we can help you..."
+                    className="w-full px-5 py-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 bg-white/50 backdrop-blur-sm resize-vertical"
+                    placeholder="Please describe your specific requirements, preferred vehicle types, dates, and any special accommodations needed..."
                   ></textarea>
                 </div>
 
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full bg-blue-600 text-white py-4 px-6 rounded-lg font-semibold hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed transition-colors duration-200 flex items-center justify-center"
+                  className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-5 px-8 rounded-xl font-bold hover:shadow-2xl disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 flex items-center justify-center group"
                 >
                   {isSubmitting ? (
                     <>
-                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-                      Sending...
+                      <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white mr-3"></div>
+                      Processing Executive Request...
                     </>
                   ) : (
-                    'Send Message'
+                    <>
+                      Submit Priority Inquiry
+                      <svg className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                      </svg>
+                    </>
                   )}
                 </button>
               </form>
             </div>
 
-            {/* Contact Info & FAQ */}
+            {/* Premium Contact Info & FAQ */}
             <div className="space-y-8">
-              {/* Office Hours */}
-              <div className="bg-white rounded-2xl shadow-lg p-8">
-                <h3 className="text-xl font-bold text-gray-900 mb-6">Office Hours</h3>
-                <div className="space-y-4">
+              {/* Executive Hours */}
+              <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl border border-gray-100 p-8">
+                <h3 className="text-2xl font-bold text-gray-900 mb-8">Service Excellence Hours</h3>
+                <div className="space-y-6">
                   {[
-                    { day: 'Monday - Friday', hours: '8:00 AM - 8:00 PM' },
-                    { day: 'Saturday', hours: '9:00 AM - 6:00 PM' },
-                    { day: 'Sunday', hours: '10:00 AM - 4:00 PM' },
-                    { day: 'Emergency Support', hours: '24/7' }
+                    { day: 'Monday - Friday', hours: '6:00 AM - 11:00 PM EST', badge: 'Premium' },
+                    { day: 'Saturday', hours: '7:00 AM - 10:00 PM EST', badge: 'Elite' },
+                    { day: 'Sunday', hours: '8:00 AM - 9:00 PM EST', badge: 'Select' },
+                    { day: '24/7 Emergency', hours: 'Always Available', badge: 'VIP' }
                   ].map((schedule, index) => (
-                    <div key={index} className="flex justify-between items-center py-3 border-b border-gray-100 last:border-b-0">
-                      <span className="text-gray-700 font-medium">{schedule.day}</span>
-                      <span className="text-blue-600 font-semibold">{schedule.hours}</span>
+                    <div key={index} className="flex justify-between items-center py-4 border-b border-gray-100 last:border-b-0">
+                      <div>
+                        <span className="text-gray-800 font-semibold text-lg">{schedule.day}</span>
+                        <span className="ml-3 px-2 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded-full">
+                          {schedule.badge}
+                        </span>
+                      </div>
+                      <span className="text-blue-600 font-bold">{schedule.hours}</span>
                     </div>
                   ))}
                 </div>
               </div>
 
-              {/* FAQ */}
-              <div className="bg-white rounded-2xl shadow-lg p-8">
-                <h3 className="text-xl font-bold text-gray-900 mb-6">Frequently Asked Questions</h3>
-                <div className="space-y-4">
+              {/* Premium FAQ */}
+              <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl border border-gray-100 p-8">
+                <div className="flex items-center justify-between mb-8">
+                  <h3 className="text-2xl font-bold text-gray-900">Executive FAQ</h3>
+                  <div className="text-sm text-gray-500 bg-gray-50 px-3 py-1 rounded-full">
+                    Most Inquired
+                  </div>
+                </div>
+                <div className="space-y-6">
                   {faqs.map((faq, index) => (
-                    <div key={index} className="border-b border-gray-100 last:border-b-0 pb-4 last:pb-0">
-                      <h4 className="font-semibold text-gray-900 mb-2">{faq.question}</h4>
-                      <p className="text-gray-600 text-sm">{faq.answer}</p>
+                    <div key={index} className="border-b border-gray-100 last:border-b-0 pb-6 last:pb-0">
+                      <h4 className="font-bold text-gray-900 text-lg mb-3">{faq.question}</h4>
+                      <p className="text-gray-600 leading-relaxed">{faq.answer}</p>
                     </div>
                   ))}
                 </div>
                 <Link
                   to="/faq"
-                  className="inline-flex items-center text-blue-600 font-medium mt-4 hover:text-blue-700 transition-colors"
+                  className="inline-flex items-center text-blue-600 font-semibold mt-6 hover:text-blue-700 transition-colors group"
                 >
-                  View all FAQs
-                  <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  Access Full Knowledge Base
+                  <svg className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
                   </svg>
                 </Link>
               </div>
@@ -306,25 +353,26 @@ const Contact = () => {
         </div>
       </section>
 
-      {/* Map Section */}
-      <section className="py-16 bg-white">
+      {/* Premium Map Section */}
+      <section className="py-20 bg-gradient-to-b from-white to-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Visit Our Location</h2>
-            <p className="text-gray-600">Come see us at our headquarters</p>
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">Flagship Experience Center</h2>
+            <p className="text-gray-600 text-lg">Visit our exclusive showroom for a personalized consultation</p>
           </div>
           
-          <div className="bg-gray-200 rounded-2xl overflow-hidden shadow-lg h-96 relative">
-            {/* Mock Map - In real implementation, you'd integrate Google Maps or similar */}
-            <div className="absolute inset-0 bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center">
-              <div className="text-center">
-                <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <span className="text-2xl text-white">📍</span>
+          <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-3xl shadow-2xl overflow-hidden h-96 relative border border-gray-200">
+            {/* Premium Mock Map */}
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="text-center max-w-md">
+                <div className="w-20 h-20 bg-gradient-to-br from-blue-600 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-6 text-white shadow-2xl">
+                  <span className="text-3xl">🏛️</span>
                 </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">DriveEasy Headquarters</h3>
-                <p className="text-gray-600">123 Drive Street, City, State 12345</p>
-                <button className="mt-4 bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors">
-                  Get Directions
+                <h3 className="text-2xl font-bold text-gray-900 mb-3">DriveEasy Flagship</h3>
+                <p className="text-gray-600 mb-2">One Premium Plaza, Suite 2500</p>
+                <p className="text-gray-500 text-sm mb-6">Valet parking available • By appointment</p>
+                <button className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-4 rounded-xl font-semibold hover:shadow-2xl transition-all duration-300">
+                  Schedule Private Tour
                 </button>
               </div>
             </div>
@@ -332,24 +380,33 @@ const Contact = () => {
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-16 bg-blue-600">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
-            Ready to Hit the Road?
+      {/* Premium CTA Section */}
+      <section className="py-20 bg-gradient-to-r from-gray-900 to-blue-900 relative overflow-hidden">
+        {/* Background Elements */}
+        <div className="absolute inset-0 opacity-5">
+          <div className="absolute inset-0" style={{
+            backgroundImage: `radial-gradient(circle at 1px 1px, white 1px, transparent 0)`,
+            backgroundSize: '50px 50px'
+          }}></div>
+        </div>
+        
+        <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-4xl font-bold text-white mb-6">
+            Ready for Extraordinary Mobility?
           </h2>
-          <p className="text-blue-100 text-xl mb-8">
-            Browse our premium fleet and find your perfect vehicle today.
+          <p className="text-blue-100 text-xl mb-10 max-w-2xl mx-auto leading-relaxed">
+            Experience the pinnacle of automotive excellence with our curated collection of premium vehicles and unparalleled service.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <div className="flex flex-col sm:flex-row gap-5 justify-center items-center">
             <Link
               to="/"
-              className="bg-white text-blue-600 px-8 py-4 rounded-lg font-semibold hover:bg-blue-50 transition-colors text-lg"
+              className="group relative bg-white text-gray-900 px-12 py-5 rounded-xl font-bold hover:shadow-2xl transition-all duration-300 overflow-hidden text-lg"
             >
-              View All Cars
+              <span className="relative z-10">Explore Master Collection</span>
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
             </Link>
-            <button className="border-2 border-white text-white px-8 py-4 rounded-lg font-semibold hover:bg-white hover:text-blue-600 transition-colors text-lg">
-              Call Now
+            <button className="group border-2 border-white/30 text-white px-12 py-5 rounded-xl font-bold hover:bg-white/10 hover:border-white/50 backdrop-blur-sm transition-all duration-300 text-lg">
+              Immediate Concierge
             </button>
           </div>
         </div>
